@@ -132,3 +132,6 @@ class TRUE extends TokenType {
 class FALSE extends TokenType {
   val literal: Boolean = false
 }
+class NONE extends TokenType{
+  val literal: String = "none"
+}

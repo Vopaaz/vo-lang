@@ -2,15 +2,15 @@ package volang.lexer
 
 import scala.collection.mutable.ArrayBuffer
 
-class Lexer(val input: String) {
-  var position: Int   = 0
-  val NULL_CHAR: Char = 0.toChar
+class Lexer(input: String) {
+  private var position: Int   = 0
+  private val NULL_CHAR: Char = 0.toChar
 
   def hasNext: Boolean = {
     position <= input.length
   }
 
-  def peekChar: Char = {
+  private def peekChar: Char = {
     var c: Char = NULL_CHAR
     if (position < input.length()) {
       c = input.charAt(position)
@@ -20,21 +20,21 @@ class Lexer(val input: String) {
     c
   }
 
-  def nextChar: Char = {
+  private def nextChar: Char = {
     val c = peekChar
     position += 1
     c
   }
 
-  def isLetterOrUnderscore(c: Char): Boolean = {
+  private def isLetterOrUnderscore(c: Char): Boolean = {
     c.isLetter || c == '_'
   }
 
-  def isDigitOrDot(c: Char): Boolean = {
+  private def isDigitOrDot(c: Char): Boolean = {
     c.isDigit || c == '.'
   }
 
-  def readNumber(head: Char): TokenType = {
+  private def readNumber(head: Char): TokenType = {
     val buff = new StringBuilder
     buff.append(head)
     while (isDigitOrDot(peekChar)) {
@@ -48,7 +48,7 @@ class Lexer(val input: String) {
     }
   }
 
-  def readIdentifierOrKeyword(head: Char): TokenType = {
+  private def readIdentifierOrKeyword(head: Char): TokenType = {
     val buff = new StringBuilder
     buff.append(head)
     while (isLetterOrUnderscore(peekChar) || peekChar.isDigit) {
@@ -65,11 +65,12 @@ class Lexer(val input: String) {
       case "while"  => new WHILE
       case "true"   => new TRUE
       case "false"  => new FALSE
+      case "none"   => new NONE
       case other    => new IDENTIFIER(other)
     }
   }
 
-  def readWord(head: Char): TokenType = {
+  private def readWord(head: Char): TokenType = {
     if (head.isDigit) {
       readNumber(head)
     } else if (isLetterOrUnderscore(head)) {
@@ -79,13 +80,13 @@ class Lexer(val input: String) {
     }
   }
 
-  def skipSpace: Unit = {
+  private def skipSpace: Unit = {
     while (peekChar == '\t' || peekChar == ' ') {
       position += 1
     }
   }
 
-  def createTokenOnFollowedByEQ(
+  private def createTokenOnFollowedByEQ(
       followed: TokenType,
       notFollowed: TokenType
   ): TokenType = {
@@ -97,25 +98,29 @@ class Lexer(val input: String) {
     }
   }
 
-  def startsWithEqual: TokenType = createTokenOnFollowedByEQ(new EQ, new ASSIGN)
+  private def startsWithEqual: TokenType =
+    createTokenOnFollowedByEQ(new EQ, new ASSIGN)
 
-  def startsWithPlus: TokenType =
+  private def startsWithPlus: TokenType =
     createTokenOnFollowedByEQ(new PLUSEQ, new PLUS)
 
-  def startsWithMinus: TokenType =
+  private def startsWithMinus: TokenType =
     createTokenOnFollowedByEQ(new MINUSEQ, new MINUS)
 
-  def startsWithTimes: TokenType =
+  private def startsWithTimes: TokenType =
     createTokenOnFollowedByEQ(new TIMESEQ, new TIMES)
 
-  def startsWithDivide: TokenType =
+  private def startsWithDivide: TokenType =
     createTokenOnFollowedByEQ(new DIVIDEEQ, new DIVIDE)
 
-  def startsWithNot: TokenType = createTokenOnFollowedByEQ(new NEQ, new NOT)
+  private def startsWithNot: TokenType =
+    createTokenOnFollowedByEQ(new NEQ, new NOT)
 
-  def startsWithGT: TokenType = createTokenOnFollowedByEQ(new GEQ, new GT)
+  private def startsWithGT: TokenType =
+    createTokenOnFollowedByEQ(new GEQ, new GT)
 
-  def startsWithLT: TokenType = createTokenOnFollowedByEQ(new LEQ, new LT)
+  private def startsWithLT: TokenType =
+    createTokenOnFollowedByEQ(new LEQ, new LT)
 
   def nextToken: TokenType = {
     skipSpace
