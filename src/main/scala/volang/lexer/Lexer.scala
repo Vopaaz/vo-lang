@@ -122,13 +122,17 @@ class Lexer(input: String) {
   private def startsWithLT: TokenType =
     createTokenOnFollowedByEQ(new LEQ, new LT)
 
-  private def catchString(c: Char): STRING = {
+  private def catchString(c: Char): TokenType = {
     val buff = new StringBuilder
-    while (peekChar != c) {
+    while (hasNext && peekChar != c) {
       buff.append(nextChar)
     }
-    nextChar
-    new STRING(buff.mkString)
+    if (hasNext) {
+      nextChar
+      new STRING(buff.mkString)
+    } else {
+      new ILLEGAL
+    }
   }
 
   def nextToken: TokenType = {
