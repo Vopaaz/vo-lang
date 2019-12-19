@@ -159,4 +159,54 @@ class LexerSpec extends FlatSpec {
     )
     testInput(input, expected)
   }
+
+  it should "parse string correctly" in {
+    val input = """
+    "This""Is"'Survival'
+    "'"
+    '"'
+    """
+    val expected = List[TokenType](
+      new LINEFEED,
+      new STRING("This"),
+      new STRING("Is"),
+      new STRING("Survival"),
+      new LINEFEED,
+      new STRING("'"),
+      new LINEFEED,
+      new STRING("\""),
+      new LINEFEED,
+      new EOF
+    )
+    testInput(input, expected)
+  }
+
+  it should "not confusing strings with others" in {
+    val input = """
+    "String" if true else 'another'
+    """
+    val expected = List[TokenType](
+      new LINEFEED,
+      new STRING("String"),
+      new IF,
+      new TRUE,
+      new ELSE,
+      new STRING("another"),
+      new LINEFEED,
+      new EOF
+    )
+    testInput(input, expected)
+  }
+
+  it should "handle incomplete strings" in {
+    val input = """
+    "should fail
+    """
+    val expected = List[TokenType](
+      new LINEFEED,
+      new ILLEGAL,
+      new EOF
+    )
+    testInput(input, expected)
+  }
 }

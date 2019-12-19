@@ -122,6 +122,15 @@ class Lexer(input: String) {
   private def startsWithLT: TokenType =
     createTokenOnFollowedByEQ(new LEQ, new LT)
 
+  private def catchString(c: Char): STRING = {
+    val buff = new StringBuilder
+    while (peekChar != c) {
+      buff.append(nextChar)
+    }
+    nextChar
+    new STRING(buff.mkString)
+  }
+
   def nextToken: TokenType = {
     skipSpace
     nextChar match {
@@ -145,6 +154,8 @@ class Lexer(input: String) {
       case '}'         => new RBRACE
       case '\\'        => new BACKSLASH
       case `NULL_CHAR` => new EOF
+      case '\"'        => catchString('\"')
+      case '\''        => catchString('\'')
       case other       => readWord(other)
     }
   }
