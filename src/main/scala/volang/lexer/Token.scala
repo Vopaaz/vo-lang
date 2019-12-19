@@ -4,7 +4,7 @@ abstract class TokenType {
   val literal: Any
   def cls = getClass()
   override def toString(): String = {
-    s"Token ${cls.toString()} '$literal'"
+    s"${cls.toString()} '$literal'"
   }
 }
 
