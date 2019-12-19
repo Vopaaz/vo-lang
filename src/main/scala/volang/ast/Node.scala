@@ -14,3 +14,5 @@ class Root extends Node {
 
 class LetStatement(val identifier: IDENTIFIER, val expression: Expression)
     extends Statement
+
+class ReturnStatement(val expression: Expression) extends Statement

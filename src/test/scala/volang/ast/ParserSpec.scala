@@ -25,9 +25,21 @@ class ParserSpec extends FlatSpec with Matchers {
   }
 
   it should "fail in invalid let statements" in {
-    val input = "let = 1"
     a[ParsingException] should be thrownBy {
-      new Parser(input).parse
+      new Parser("let = 1").parse
+    }
+
+    a[ParsingException] should be thrownBy {
+      new Parser("let x 1").parse
+    }
+
+    a[ParsingException] should be thrownBy {
+      new Parser("let 1 = x").parse
+    }
+
+    a[ParsingException] should be thrownBy {
+      new Parser("let x").parse
     }
   }
+
 }

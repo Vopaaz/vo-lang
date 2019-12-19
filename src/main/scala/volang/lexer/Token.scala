@@ -2,9 +2,8 @@ package volang.lexer
 
 abstract class TokenType {
   val literal: Any
-  def cls = getClass()
   override def toString(): String = {
-    s"${cls.toString()} '$literal'"
+    s"${getClass.toString} '$literal'"
   }
 }
 
@@ -132,6 +131,6 @@ class TRUE extends TokenType {
 class FALSE extends TokenType {
   val literal: Boolean = false
 }
-class NONE extends TokenType{
+class NONE extends TokenType {
   val literal: String = "none"
 }

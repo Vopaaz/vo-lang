@@ -1,6 +1,8 @@
 package volang.ast
 
 import volang.lexer._
+import scala.reflect._
+import scala.reflect.runtime.universe._
 
 class Parser(input: String) {
   private val l: Lexer             = new Lexer(input)
@@ -16,7 +18,8 @@ class Parser(input: String) {
 
   private def parseStatement: Option[Statement] = {
     peekToken match {
-      case let: LET => Some(parseLetStatement)
+      case _: LET    => Some(parseLetStatement)
+      case _: RETURN => Some(parseReturnStatement)
       case other => {
         nextToken
         None
@@ -24,26 +27,25 @@ class Parser(input: String) {
     }
   }
 
+  private def expect[T: ClassTag](token: TokenType) = {
+    if (!classTag[T].runtimeClass.isInstance(token)) {
+      throw new ParsingException(
+        s"A '${classTag[T].toString}' is expected, $lastToken found."
+      )
+    }
+  }
+
   private def parseLetStatement: LetStatement = {
-    if (!nextToken.isInstanceOf[LET]) {
-      throw new ParsingException(s"A 'let' is expected, $lastToken found.")
-    }
-
-    if (!peekToken.isInstanceOf[IDENTIFIER]) {
-      throw new ParsingException(
-        s"An identifier is expected, $peekToken found."
-      )
-    }
+    expect[LET](nextToken)
+    expect[IDENTIFIER](peekToken)
     val identifier = nextToken.asInstanceOf[IDENTIFIER]
-
-    if (!nextToken.isInstanceOf[ASSIGN]) {
-      throw new ParsingException(
-        s"A '=' is expected, $lastToken found."
-      )
-    }
-
+    expect[ASSIGN](nextToken)
     val expression = parseExpression
     new LetStatement(identifier, expression)
+  }
+
+  private def parseReturnStatement: ReturnStatement = {
+    new ReturnStatement(parseExpression)
   }
 
   private def parseExpression: Expression = {
