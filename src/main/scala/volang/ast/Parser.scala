@@ -37,13 +37,14 @@ class Parser(input: String) {
   private def parseLetStatement: LetStatement = {
     expect[LET](nextToken)
     expect[IDENTIFIER](peekToken)
-    val identifier = nextToken.asInstanceOf[IDENTIFIER]
+    val identifier = new Identifier(nextToken.asInstanceOf[IDENTIFIER])
     expect[ASSIGN](nextToken)
     val expression = parseExpression
     new LetStatement(identifier, expression)
   }
 
   private def parseReturnStatement: ReturnStatement = {
+    expect[RETURN](nextToken)
     new ReturnStatement(parseExpression)
   }
 
