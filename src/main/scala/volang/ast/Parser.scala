@@ -2,7 +2,6 @@ package volang.ast
 
 import volang.lexer._
 import scala.reflect._
-import scala.reflect.runtime.universe._
 
 class Parser(input: String) {
   private val l: Lexer             = new Lexer(input)
