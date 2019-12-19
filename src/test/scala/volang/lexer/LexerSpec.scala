@@ -209,4 +209,14 @@ class LexerSpec extends FlatSpec {
     )
     testInput(input, expected)
   }
+
+  it should "parse '_' as valid identifier" in {
+    val input = "_ __ __some__ that_is"
+    val expected = List[TokenType](
+      new IDENTIFIER("_"),
+      new IDENTIFIER("__"),
+      new IDENTIFIER("__some__"),
+      new IDENTIFIER("that_is"),
+    )
+  }
 }
