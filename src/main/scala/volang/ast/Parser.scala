@@ -55,10 +55,9 @@ class Parser(input: String) {
 
   private def parseExpression(pri: Pri.Value): Expression = {
     while (nextToken match {
-             case _: LINEFEED => true
-             case others      => false
+             case _: LINEFEED => false
+             case others      => true
            }) {}
-    nextToken
     new Expression
   }
 
