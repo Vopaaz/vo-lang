@@ -148,6 +148,7 @@ class Lexer(input: String) {
       case '<'         => startsWithLT
       case ','         => new COMMA
       case '.'         => new DOT
+      case '\r'        => new LINEFEED
       case '\n'        => new LINEFEED
       case ';'         => new SEMICOLON
       case '('         => new LPAREN
