@@ -1,6 +1,7 @@
 package volang.lexer
 
 import org.scalatest.FlatSpec
+import scala.language.experimental
 
 class LexerSpec extends FlatSpec {
 
@@ -218,5 +219,14 @@ class LexerSpec extends FlatSpec {
       new IDENTIFIER("__some__"),
       new IDENTIFIER("that_is"),
     )
+    testInput(input, expected)
+  }
+
+  it should "parse single number without linefeed" in {
+    val input = "5.5"
+    val expected = List[TokenType](
+      new NUMBER(5.5)
+    )
+    testInput(input, expected)
   }
 }

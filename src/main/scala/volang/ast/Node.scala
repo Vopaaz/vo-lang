@@ -51,3 +51,10 @@ class Identifier(val token: IDENTIFIER) extends Expression {
     value
   }
 }
+
+class NumberLiteral(val token: NUMBER) extends Expression {
+  val value = token.literal
+  override def toString(): String = {
+    value.toString
+  }
+}

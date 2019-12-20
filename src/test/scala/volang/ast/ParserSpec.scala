@@ -74,7 +74,7 @@ class ParserSpec extends FlatSpec with Matchers {
     val s3 = statements(2).asInstanceOf[ReturnStatement]
   }
 
-  it should "parse single expression statements" in {
+  it should "parse single expression statement" in {
     val statements = new Parser("""s
     """).parse.statements
     assert(statements.length === 1)
@@ -84,5 +84,18 @@ class ParserSpec extends FlatSpec with Matchers {
     val expression = statement.expression
     assert(expression.isInstanceOf[Identifier])
     assert(expression.asInstanceOf[Identifier].value === "s")
+  }
+
+  it should "parse single number expression statement" in {
+    val statements = new Parser("5.5").parse.statements
+    assert(statements.length === 1)
+    val statementRaw = statements(0)
+    assert(statementRaw.isInstanceOf[ExpressionStatement])
+    val expressionRaw =
+      statementRaw.asInstanceOf[ExpressionStatement].expression
+    assert(expressionRaw.isInstanceOf[NumberLiteral])
+    val expression = expressionRaw.asInstanceOf[NumberLiteral]
+    assert(expression.value === 5.5)
+    assert(expression.toString === "5.5")
   }
 }
