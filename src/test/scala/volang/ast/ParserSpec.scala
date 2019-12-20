@@ -1,8 +1,14 @@
 package volang.ast
 
 import org.scalatest._
+import volang.ast.Pri
 
 class ParserSpec extends FlatSpec with Matchers {
+  "Priorities" should "be organized well" in {
+    assert(Pri.lowest < Pri.><)
+    assert(Pri.+ < Pri.*/)
+    assert(Pri.*/ < Pri.call)
+  }
 
   "Parser" should "parse simple let statements" in {
     val input = """
@@ -40,6 +46,15 @@ class ParserSpec extends FlatSpec with Matchers {
     a[ParsingException] should be thrownBy {
       new Parser("let x").parse
     }
+  }
+
+  it should "handle empty lines correctly" in {
+    val input = """
+
+
+
+    """
+    assert(new Parser(input).parse.statements.length === 0)
   }
 
   it should "parse simple return statements" in {

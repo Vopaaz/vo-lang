@@ -14,14 +14,14 @@ class SingleLiteralExpression(val token: TokenType) extends Expression {
   }
 }
 
-class Root extends Node {
+class Root(val src: String) extends Node {
   val statements = new ListBuffer[Statement]
   override def toString(): String = {
-    val buff = new StringBuilder
+    val buff = new StringBuilder(s"---Source---\n$src\n---Statements---\n")
     statements.foreach(x => {
       buff.append(x.toString())
     })
-    buff.append("\n")
+    buff.append("\n---------\n")
     buff.mkString
   }
 }

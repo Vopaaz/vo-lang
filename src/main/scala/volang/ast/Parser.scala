@@ -3,6 +3,10 @@ package volang.ast
 import volang.lexer._
 import scala.reflect._
 
+object Pri extends Enumeration {
+  val lowest, ==, ><, +, */, -!, call = Value
+}
+
 class Parser(input: String) {
   private val l: Lexer             = new Lexer(input)
   private var peekToken: TokenType = l.nextToken
@@ -19,10 +23,11 @@ class Parser(input: String) {
     peekToken match {
       case _: LET    => Some(parseLetStatement)
       case _: RETURN => Some(parseReturnStatement)
-      case other => {
+      case _: LINEFEED => {
         nextToken
         None
       }
+      case other => Some(parseExpressionStatement)
     }
   }
 
@@ -39,21 +44,30 @@ class Parser(input: String) {
     expect[IDENTIFIER](peekToken)
     val identifier = new Identifier(nextToken.asInstanceOf[IDENTIFIER])
     expect[ASSIGN](nextToken)
-    val expression = parseExpression
+    val expression = parseExpression(Pri.lowest)
     new LetStatement(identifier, expression)
   }
 
   private def parseReturnStatement: ReturnStatement = {
     expect[RETURN](nextToken)
-    new ReturnStatement(parseExpression)
+    new ReturnStatement(parseExpression(Pri.lowest))
   }
 
-  private def parseExpression: Expression = {
+  private def parseExpression(pri: Pri.Value): Expression = {
+    while (nextToken match {
+             case _: LINEFEED => true
+             case others      => false
+           }) {}
+    nextToken
     new Expression
   }
 
+  private def parseExpressionStatement: ExpressionStatement = {
+    new ExpressionStatement(parseExpression(Pri.lowest))
+  }
+
   def parse: Root = {
-    val root = new Root
+    val root = new Root(input)
     while (!peekToken.isInstanceOf[EOF]) {
       val s = parseStatement
       if (s.isDefined) {
