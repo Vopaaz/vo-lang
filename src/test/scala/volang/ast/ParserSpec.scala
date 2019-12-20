@@ -80,6 +80,9 @@ class ParserSpec extends FlatSpec with Matchers {
     assert(statements.length === 1)
     val statementRaw = statements(0)
     assert(statementRaw.isInstanceOf[ExpressionStatement])
-    val statement = statementRaw.asInstanceOf[ExpressionStatement]
+    val statement  = statementRaw.asInstanceOf[ExpressionStatement]
+    val expression = statement.expression
+    assert(expression.isInstanceOf[Identifier])
+    assert(expression.asInstanceOf[Identifier].value === "s")
   }
 }

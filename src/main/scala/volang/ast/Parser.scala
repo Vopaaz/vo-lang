@@ -54,15 +54,27 @@ class Parser(input: String) {
   }
 
   private def parseExpression(pri: Pri.Value): Expression = {
+    val expression = peekToken match {
+      case _: IDENTIFIER => parseIdentifier
+      case others        => new Expression
+    }
+
     while (nextToken match {
              case _: LINEFEED => false
              case others      => true
            }) {}
-    new Expression
+
+    expression
   }
 
   private def parseExpressionStatement: ExpressionStatement = {
     new ExpressionStatement(parseExpression(Pri.lowest))
+  }
+
+  private def parseIdentifier: Identifier = {
+    val t = nextToken
+    assert(t.isInstanceOf[IDENTIFIER])
+    new Identifier(t.asInstanceOf[IDENTIFIER])
   }
 
   def parse: Root = {
