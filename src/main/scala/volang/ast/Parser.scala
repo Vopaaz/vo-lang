@@ -57,14 +57,13 @@ class Parser(input: String) {
     val expression = peekToken match {
       case _: IDENTIFIER => parseIdentifier
       case _: NUMBER     => parseNumberLiteral
-      case others        => new Expression
+      case _: NOT        => parsePrefixExpression
+      case _: MINUS      => parsePrefixExpression
+      case others => {
+        nextToken
+        new Expression
+      }
     }
-
-    while (nextToken match {
-             case _: LINEFEED => false
-             case _: EOF      => false
-             case others      => true
-           }) {}
 
     expression
   }
@@ -79,6 +78,14 @@ class Parser(input: String) {
 
   private def parseNumberLiteral: NumberLiteral = {
     new NumberLiteral(nextToken.asInstanceOf[NUMBER])
+  }
+
+  private def parseBooleanLiteral: BooleanLiteral = {
+    new BooleanLiteral(nextToken)
+  }
+
+  private def parsePrefixExpression: PrefixExpression = {
+    new PrefixExpression(nextToken, parseExpression(Pri.-!))
   }
 
   def parse: Root = {

@@ -2,6 +2,7 @@ package volang.ast
 
 import org.scalatest._
 import volang.ast.Pri
+import volang.lexer._
 
 class ParserSpec extends FlatSpec with Matchers {
   "Priorities" should "be organized well" in {
@@ -14,7 +15,7 @@ class ParserSpec extends FlatSpec with Matchers {
     val input = """
         let x = 10
         let y=x
-        let z = 10 + 10 *100
+        let z = true
         """
 
     val p: Parser  = new Parser(input)
@@ -57,9 +58,9 @@ class ParserSpec extends FlatSpec with Matchers {
     assert(new Parser(input).parse.statements.length === 0)
   }
 
-  it should "parse simple return statements" in {
+  it should "parse simple return statements returning number" in {
     val input = """
-        return 3+5
+        return 3
         return 1
         return 12
         """
@@ -74,16 +75,20 @@ class ParserSpec extends FlatSpec with Matchers {
     val s3 = statements(2).asInstanceOf[ReturnStatement]
   }
 
-  it should "parse single expression statement" in {
+  it should "parse single identifier expression statement" in {
+    def checkStatement(statementRaw: Statement) = {
+      assert(statementRaw.isInstanceOf[ExpressionStatement])
+      val statement  = statementRaw.asInstanceOf[ExpressionStatement]
+      val expression = statement.expression
+      assert(expression.isInstanceOf[Identifier])
+      assert(expression.asInstanceOf[Identifier].value === "s")
+    }
     val statements = new Parser("""s
+    s
+    s
     """).parse.statements
-    assert(statements.length === 1)
-    val statementRaw = statements(0)
-    assert(statementRaw.isInstanceOf[ExpressionStatement])
-    val statement  = statementRaw.asInstanceOf[ExpressionStatement]
-    val expression = statement.expression
-    assert(expression.isInstanceOf[Identifier])
-    assert(expression.asInstanceOf[Identifier].value === "s")
+    assert(statements.length === 3)
+    statements.foreach(checkStatement)
   }
 
   it should "parse single number expression statement" in {
@@ -97,5 +102,36 @@ class ParserSpec extends FlatSpec with Matchers {
     val expression = expressionRaw.asInstanceOf[NumberLiteral]
     assert(expression.value === 5.5)
     assert(expression.toString === "5.5")
+  }
+
+  it should "parse prefix expression, decorating numbers, statement" in {
+    val input = """
+    -5
+    !10
+    -0.2
+    """
+
+    val statements = new Parser(input).parse.statements
+    assert(statements.length == 3)
+    val zipped = statements.zip(
+      List[List[TokenType]](
+        List[TokenType](new MINUS, new NUMBER(5)),
+        List[TokenType](new NOT, new NUMBER(10)),
+        List[TokenType](new MINUS, new NUMBER(0.2))
+      )
+    )
+    for ((statementRaw: Statement, expected: List[TokenType]) <- zipped) {
+      assert(statementRaw.isInstanceOf[ExpressionStatement])
+      val statement     = statementRaw.asInstanceOf[ExpressionStatement]
+      val expressionRaw = statement.expression
+      assert(expressionRaw.isInstanceOf[PrefixExpression])
+      val expression = expressionRaw.asInstanceOf[PrefixExpression]
+      assert(expression.operatorToken.getClass === expected(0).getClass)
+      assert(
+        expression.right.asInstanceOf[NumberLiteral].token.literal === expected(
+          1
+        ).literal
+      )
+    }
   }
 }

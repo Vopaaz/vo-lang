@@ -135,6 +135,13 @@ class Lexer(input: String) {
     }
   }
 
+  private def handleCRLF: TokenType = {
+    if (peekChar == '\n') {
+      nextChar
+    }
+    new LINEFEED
+  }
+
   def nextToken: TokenType = {
     skipSpace
     nextChar match {
@@ -148,7 +155,7 @@ class Lexer(input: String) {
       case '<'         => startsWithLT
       case ','         => new COMMA
       case '.'         => new DOT
-      case '\r'        => new LINEFEED
+      case '\r'        => handleCRLF
       case '\n'        => new LINEFEED
       case ';'         => new SEMICOLON
       case '('         => new LPAREN

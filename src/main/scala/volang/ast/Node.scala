@@ -58,3 +58,20 @@ class NumberLiteral(val token: NUMBER) extends Expression {
     value.toString
   }
 }
+
+class BooleanLiteral(val token: TokenType) extends Expression {
+  val value = token match {
+    case x: TRUE  => x.literal
+    case x: FALSE => x.literal
+  }
+  override def toString(): String = {
+    value.toString
+  }
+}
+
+class PrefixExpression(val operatorToken: TokenType, val right: Expression)
+    extends Expression {
+  override def toString(): String = {
+    s"(${operatorToken.literal}${right.toString()})"
+  }
+}
