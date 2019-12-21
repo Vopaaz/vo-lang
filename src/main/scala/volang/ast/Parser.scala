@@ -8,10 +8,17 @@ object Pri extends Enumeration {
 
   def priOf(token: TokenType) = {
     token match {
-      case _: EQ  => Pri.==
-      case _: NEQ => Pri.==
-
-      case _: PLUS => Pri.+-
+      case _: EQ     => Pri.==
+      case _: NEQ    => Pri.==
+      case _: LT     => Pri.><
+      case _: GT     => Pri.><
+      case _: LEQ    => Pri.><
+      case _: GEQ    => Pri.><
+      case _: PLUS   => Pri.+-
+      case _: MINUS  => Pri.+-
+      case _: TIMES  => Pri.*/
+      case _: DIVIDE => Pri.*/
+      case _: NOT    => Pri.!
     }
   }
 }
@@ -97,12 +104,7 @@ class Parser(input: String) {
     val token = nextToken
     new PrefixExpression(
       token,
-      parseExpression(
-        token match {
-          case _: MINUS => Pri.+-
-          case _: NOT   => Pri.!
-        }
-      )
+      parseExpression(Pri.priOf(token))
     )
   }
 
