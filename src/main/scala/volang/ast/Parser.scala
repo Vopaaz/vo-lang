@@ -4,7 +4,16 @@ import volang.lexer._
 import scala.reflect._
 
 object Pri extends Enumeration {
-  val lowest, ==, ><, +, */, -!, call = Value
+  val lowest, ==, ><, +-, */, !, call = Value
+
+  def priOf(token: TokenType) = {
+    token match {
+      case _: EQ  => Pri.==
+      case _: NEQ => Pri.==
+
+      case _: PLUS => Pri.+-
+    }
+  }
 }
 
 class Parser(input: String) {
@@ -85,7 +94,16 @@ class Parser(input: String) {
   }
 
   private def parsePrefixExpression: PrefixExpression = {
-    new PrefixExpression(nextToken, parseExpression(Pri.-!))
+    val token = nextToken
+    new PrefixExpression(
+      token,
+      parseExpression(
+        token match {
+          case _: MINUS => Pri.+-
+          case _: NOT   => Pri.!
+        }
+      )
+    )
   }
 
   def parse: Root = {

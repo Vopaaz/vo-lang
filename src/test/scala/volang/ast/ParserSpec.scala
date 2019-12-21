@@ -7,7 +7,7 @@ import volang.lexer._
 class ParserSpec extends FlatSpec with Matchers {
   "Priorities" should "be organized well" in {
     assert(Pri.lowest < Pri.><)
-    assert(Pri.+ < Pri.*/)
+    assert(Pri.+- < Pri.*/)
     assert(Pri.*/ < Pri.call)
   }
 
@@ -122,8 +122,8 @@ class ParserSpec extends FlatSpec with Matchers {
     )
     for ((statementRaw: Statement, expected: List[TokenType]) <- zipped) {
       assert(statementRaw.isInstanceOf[ExpressionStatement])
-      val statement     = statementRaw.asInstanceOf[ExpressionStatement]
-      val expressionRaw = statement.expression
+      val expressionRaw =
+        statementRaw.asInstanceOf[ExpressionStatement].expression
       assert(expressionRaw.isInstanceOf[PrefixExpression])
       val expression = expressionRaw.asInstanceOf[PrefixExpression]
       assert(expression.operatorToken.getClass === expected(0).getClass)
@@ -132,6 +132,42 @@ class ParserSpec extends FlatSpec with Matchers {
           1
         ).literal
       )
+    }
+  }
+
+  it should "parse infix expression, which combines only numbers" in {
+    val input      = """
+      5 + 5
+      5 - 5
+      5*5
+      5 >= 5
+      5 != 5
+      5 == 5
+    """
+    val statements = new Parser(input).parse.statements
+    assert(statements.length === 6)
+    val zipped = statements.zip(
+      List[TokenType](
+        new PLUS,
+        new MINUS,
+        new TIMES,
+        new GEQ,
+        new NEQ,
+        new EQ
+      )
+    )
+    for ((statementRaw: Statement, expected: TokenType) <- zipped) {
+      assert(statementRaw.isInstanceOf[ExpressionStatement])
+      val expressionRaw =
+        statementRaw.asInstanceOf[ExpressionStatement].expression
+      assert(expressionRaw.isInstanceOf[InfixExpression])
+      val expression = expressionRaw.asInstanceOf[InfixExpression]
+      val (left, op, right) =
+        (expression.left, expression.operatorToken, expression.right)
+      assert(left.isInstanceOf[NumberLiteral])
+      assert(right.isInstanceOf[NumberLiteral])
+      assert(left.asInstanceOf[NumberLiteral].value == 5)
+      assert(op.getClass === expected.getClass)
     }
   }
 }
