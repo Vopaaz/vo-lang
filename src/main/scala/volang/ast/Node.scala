@@ -75,3 +75,13 @@ class PrefixExpression(val operatorToken: TokenType, val right: Expression)
     s"(${operatorToken.literal}${right.toString()})"
   }
 }
+
+class InfixExpression(
+    val left: Expression,
+    val operatorToken: TokenType,
+    val right: Expression
+) extends Expression {
+  override def toString(): String = {
+    s"(${left.toString} ${operatorToken.literal.toString} ${right.toString})"
+  }
+}

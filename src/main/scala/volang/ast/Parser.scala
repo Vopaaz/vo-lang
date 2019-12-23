@@ -6,7 +6,7 @@ import scala.reflect._
 object Pri extends Enumeration {
   val lowest, ==, ><, +-, */, !, call = Value
 
-  def priOf(token: TokenType) = {
+  def of(token: TokenType) = {
     token match {
       case _: EQ     => Pri.==
       case _: NEQ    => Pri.==
@@ -19,19 +19,22 @@ object Pri extends Enumeration {
       case _: TIMES  => Pri.*/
       case _: DIVIDE => Pri.*/
       case _: NOT    => Pri.!
+      case others    => Pri.lowest
     }
   }
 }
 
 class Parser(input: String) {
-  private val l: Lexer             = new Lexer(input)
-  private var peekToken: TokenType = l.nextToken
-  private var lastToken: TokenType = new ILLEGAL
+  private val l: Lexer                 = new Lexer(input)
+  private var peekToken: TokenType     = l.nextToken
+  private var peekPeekToken: TokenType = l.nextToken
+  private var lastToken: TokenType     = new ILLEGAL
 
   private def nextToken: TokenType = {
     val token = peekToken
+    peekToken = peekPeekToken
     lastToken = token
-    peekToken = l.nextToken
+    peekPeekToken = l.nextToken
     token
   }
 
@@ -70,18 +73,24 @@ class Parser(input: String) {
   }
 
   private def parseExpression(pri: Pri.Value): Expression = {
-    val expression = peekToken match {
-      case _: IDENTIFIER => parseIdentifier
-      case _: NUMBER     => parseNumberLiteral
-      case _: NOT        => parsePrefixExpression
-      case _: MINUS      => parsePrefixExpression
-      case others => {
-        nextToken
-        new Expression
-      }
+    var left: Option[Expression] = peekToken match {
+      case _: NOT   => Some(parsePrefixExpression)
+      case _: MINUS => Some(parsePrefixExpression)
+      case others   => None
     }
 
-    expression
+    if (!left.isDefined) {
+      left = peekToken match {
+        case _: IDENTIFIER => Some(parseIdentifier)
+        case _: NUMBER     => Some(parseNumberLiteral)
+        case _: TRUE       => Some(parseBooleanLiteral)
+        case _: FALSE      => Some(parseBooleanLiteral)
+      }
+    }
+    while (!peekToken.isInstanceOf[LINEFEED] && pri < Pri.of(peekToken)) {
+      left = Some(parseInfixExpression(left.get))
+    }
+    left.getOrElse(new Expression)
   }
 
   private def parseExpressionStatement: ExpressionStatement = {
@@ -104,8 +113,13 @@ class Parser(input: String) {
     val token = nextToken
     new PrefixExpression(
       token,
-      parseExpression(Pri.priOf(token))
+      parseExpression(Pri.of(token))
     )
+  }
+
+  private def parseInfixExpression(left: Expression): InfixExpression = {
+    val token = nextToken
+    new InfixExpression(left, token, parseExpression(Pri.of(token)))
   }
 
   def parse: Root = {
