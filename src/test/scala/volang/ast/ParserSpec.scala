@@ -135,7 +135,7 @@ class ParserSpec extends FlatSpec with Matchers {
     }
   }
 
-  it should "parse infix expression, which combines only numbers" in {
+  it should "parse simple infix expression, which combines only numbers" in {
     val input      = """
       5 + 5
       5 - 5
@@ -169,5 +169,42 @@ class ParserSpec extends FlatSpec with Matchers {
       assert(left.asInstanceOf[NumberLiteral].value == 5)
       assert(op.getClass === expected.getClass)
     }
+  }
+  it should "parse simple infix expression, which contains only identifier" in {
+    val input      = "a-b"
+    val statements = new Parser(input).parse.statements
+    assert(statements.length == 1)
+    val statementRaw = statements(0)
+    assert(statementRaw.isInstanceOf[ExpressionStatement])
+    val expressionRaw =
+      statementRaw.asInstanceOf[ExpressionStatement].expression
+    assert(expressionRaw.isInstanceOf[InfixExpression])
+    val expression = expressionRaw.asInstanceOf[InfixExpression]
+    assert(expression.left.isInstanceOf[Identifier])
+    assert(expression.left.asInstanceOf[Identifier].value === "a")
+    assert(expression.operatorToken.isInstanceOf[MINUS])
+    assert(expression.right.isInstanceOf[Identifier])
+    assert(expression.right.asInstanceOf[Identifier].value === "b")
+  }
+
+  it should "parse complex infix expression correctly" in {
+    val tests = List(
+      ("-a*b", "((-a) * b)"),
+      ("!-a + b", "((!(-a)) + b)"),
+      ("a+b + c", "((a + b) + c)")
+    )
+
+    tests.foreach(tuple => {
+      val input        = tuple._1
+      val expected     = tuple._2
+      val statementRaw = new Parser(input).parse.statements(0)
+      assert(statementRaw.isInstanceOf[ExpressionStatement])
+      val expressionRaw =
+        statementRaw.asInstanceOf[ExpressionStatement].expression
+      assert(expressionRaw.isInstanceOf[InfixExpression])
+      assert(
+        expressionRaw.asInstanceOf[InfixExpression].toString() === expected
+      )
+    })
   }
 }

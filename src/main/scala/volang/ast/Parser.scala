@@ -4,7 +4,7 @@ import volang.lexer._
 import scala.reflect._
 
 object Pri extends Enumeration {
-  val lowest, ==, ><, +-, */, !, call = Value
+  val lowest, ==, ><, +-, */, prefix, call = Value
 
   def of(token: TokenType) = {
     token match {
@@ -18,23 +18,24 @@ object Pri extends Enumeration {
       case _: MINUS  => Pri.+-
       case _: TIMES  => Pri.*/
       case _: DIVIDE => Pri.*/
-      case _: NOT    => Pri.!
+      case _: NOT    => Pri.prefix
       case others    => Pri.lowest
     }
   }
 }
 
 class Parser(input: String) {
-  private val l: Lexer                 = new Lexer(input)
-  private var peekToken: TokenType     = l.nextToken
-  private var peekPeekToken: TokenType = l.nextToken
-  private var lastToken: TokenType     = new ILLEGAL
+  private val l: Lexer             = new Lexer(input)
+  private var peekToken: TokenType = l.nextToken
+  // private var peekPeekToken: TokenType = l.nextToken
+  private var lastToken: TokenType = new ILLEGAL
 
   private def nextToken: TokenType = {
     val token = peekToken
-    peekToken = peekPeekToken
+    // peekToken = peekPeekToken
     lastToken = token
-    peekPeekToken = l.nextToken
+    // peekPeekToken = l.nextToken
+    peekToken = l.nextToken
     token
   }
 
@@ -87,7 +88,8 @@ class Parser(input: String) {
         case _: FALSE      => Some(parseBooleanLiteral)
       }
     }
-    while (!peekToken.isInstanceOf[LINEFEED] && pri < Pri.of(peekToken)) {
+    while (!peekToken.isInstanceOf[LINEFEED] && !peekToken
+             .isInstanceOf[EOF] && pri < Pri.of(peekToken)) {
       left = Some(parseInfixExpression(left.get))
     }
     left.getOrElse(new Expression)
@@ -113,7 +115,7 @@ class Parser(input: String) {
     val token = nextToken
     new PrefixExpression(
       token,
-      parseExpression(Pri.of(token))
+      parseExpression(Pri.prefix)
     )
   }
 
