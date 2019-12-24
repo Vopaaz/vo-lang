@@ -187,6 +187,21 @@ class ParserSpec extends FlatSpec with Matchers {
     assert(expression.right.asInstanceOf[Identifier].value === "b")
   }
 
+  def testInfixExpressions(tests: List[Tuple2[String, String]]): Unit = {
+    tests.foreach(tuple => {
+      val input        = tuple._1
+      val expected     = tuple._2
+      val statementRaw = new Parser(input).parse.statements(0)
+      assert(statementRaw.isInstanceOf[ExpressionStatement])
+      val expressionRaw =
+        statementRaw.asInstanceOf[ExpressionStatement].expression
+      assert(expressionRaw.isInstanceOf[InfixExpression])
+      assert(
+        expressionRaw.asInstanceOf[InfixExpression].toString() === expected
+      )
+    })
+  }
+
   it should "parse complex infix expression correctly" in {
     val tests = List[Tuple2[String, String]](
       ("-a*b", "((-a) * b)"),
@@ -202,19 +217,7 @@ class ParserSpec extends FlatSpec with Matchers {
       ),
       ("-1+1", "((-1.0) + 1.0)")
     )
-
-    tests.foreach(tuple => {
-      val input        = tuple._1
-      val expected     = tuple._2
-      val statementRaw = new Parser(input).parse.statements(0)
-      assert(statementRaw.isInstanceOf[ExpressionStatement])
-      val expressionRaw =
-        statementRaw.asInstanceOf[ExpressionStatement].expression
-      assert(expressionRaw.isInstanceOf[InfixExpression])
-      assert(
-        expressionRaw.asInstanceOf[InfixExpression].toString() === expected
-      )
-    })
+    testInfixExpressions(tests)
   }
 
   it should "parse multiple infix expressions correctly" in {
@@ -254,5 +257,15 @@ class ParserSpec extends FlatSpec with Matchers {
     val exp2 = statements(2).asInstanceOf[ReturnStatement].expression
     assert(exp2.isInstanceOf[BooleanLiteral])
     assert(exp2.asInstanceOf[BooleanLiteral].value == true)
+  }
+
+  it should "parse grouped expressions correctly" in {
+    val tests: List[Tuple2[String, String]] = List(
+      ("(1+2)", "(1.0 + 2.0)"),
+      ("1 + (2 + 3)", "(1.0 + (2.0 + 3.0))"),
+      ("1*(2+3)", "(1 * (2 + 3))"),
+      ("!(1+2)", "(!(1 + 2))")
+    )
+    testInfixExpressions(tests)
   }
 }
