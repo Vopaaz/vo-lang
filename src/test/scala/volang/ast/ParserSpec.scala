@@ -216,4 +216,18 @@ class ParserSpec extends FlatSpec with Matchers {
       )
     })
   }
+
+  it should "parse multiple infix expressions correctly" in {
+    val input      = """
+    1+2
+    1+2
+    1+2
+    """
+    val statements = new Parser(input).parse.statements
+    statements.foreach(statement => {
+      assert(statement.isInstanceOf[ExpressionStatement])
+      val expression = statement.asInstanceOf[ExpressionStatement].expression
+      assert(expression.toString === "(1.0 + 2.0)")
+    })
+  }
 }
