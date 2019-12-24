@@ -27,14 +27,11 @@ object Pri extends Enumeration {
 class Parser(input: String) {
   private val l: Lexer             = new Lexer(input)
   private var peekToken: TokenType = l.nextToken
-  // private var peekPeekToken: TokenType = l.nextToken
   private var lastToken: TokenType = new ILLEGAL
 
   private def nextToken: TokenType = {
     val token = peekToken
-    // peekToken = peekPeekToken
     lastToken = token
-    // peekPeekToken = l.nextToken
     peekToken = l.nextToken
     token
   }

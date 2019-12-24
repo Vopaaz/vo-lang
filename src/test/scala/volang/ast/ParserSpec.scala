@@ -199,7 +199,8 @@ class ParserSpec extends FlatSpec with Matchers {
       (
         "3 + 4 * 5 == 3 * 1 + 4 * 5",
         "((3.0 + (4.0 * 5.0)) == ((3.0 * 1.0) + (4.0 * 5.0)))"
-      )
+      ),
+      ("-1+1", "((-1.0) + 1.0)")
     )
 
     tests.foreach(tuple => {
