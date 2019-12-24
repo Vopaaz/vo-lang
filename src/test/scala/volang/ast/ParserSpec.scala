@@ -188,10 +188,18 @@ class ParserSpec extends FlatSpec with Matchers {
   }
 
   it should "parse complex infix expression correctly" in {
-    val tests = List(
+    val tests = List[Tuple2[String, String]](
       ("-a*b", "((-a) * b)"),
       ("!-a + b", "((!(-a)) + b)"),
-      ("a+b + c", "((a + b) + c)")
+      ("a+b + c", "((a + b) + c)"),
+      ("!!a + !!1", "((!(!a)) + (!(!1.0)))"),
+      ("a+b/c", "(a + (b / c))"),
+      ("a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"),
+      ("5 > 4 == 3 < 4", "((5.0 > 4.0) == (3.0 < 4.0))"),
+      (
+        "3 + 4 * 5 == 3 * 1 + 4 * 5",
+        "((3.0 + (4.0 * 5.0)) == ((3.0 * 1.0) + (4.0 * 5.0)))"
+      )
     )
 
     tests.foreach(tuple => {
