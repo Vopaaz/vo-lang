@@ -85,10 +85,12 @@ class Parser(input: String) {
         case _: FALSE      => Some(parseBooleanLiteral)
       }
     }
+
     while (!peekToken.isInstanceOf[LINEFEED] && !peekToken
              .isInstanceOf[EOF] && pri < Pri.of(peekToken)) {
       left = Some(parseInfixExpression(left.get))
     }
+
     left.getOrElse(new Expression)
   }
 

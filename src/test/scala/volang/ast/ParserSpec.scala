@@ -230,4 +230,29 @@ class ParserSpec extends FlatSpec with Matchers {
       assert(expression.toString === "(1.0 + 2.0)")
     })
   }
+
+  it should "parse boolean lets, returns, and expressions" in {
+    val input = """
+    true
+    let x = false
+    return true
+    """
+
+    val statements = new Parser(input).parse.statements
+
+    assert(statements(0).isInstanceOf[ExpressionStatement])
+    val exp0 = statements(0).asInstanceOf[ExpressionStatement].expression
+    assert(exp0.isInstanceOf[BooleanLiteral])
+    assert(exp0.asInstanceOf[BooleanLiteral].value == true)
+
+    assert(statements(1).isInstanceOf[LetStatement])
+    val exp1 = statements(1).asInstanceOf[LetStatement].expression
+    assert(exp1.isInstanceOf[BooleanLiteral])
+    assert(exp1.asInstanceOf[BooleanLiteral].value == false)
+
+    assert(statements(2).isInstanceOf[ReturnStatement])
+    val exp2 = statements(2).asInstanceOf[ReturnStatement].expression
+    assert(exp2.isInstanceOf[BooleanLiteral])
+    assert(exp2.asInstanceOf[BooleanLiteral].value == true)
+  }
 }
