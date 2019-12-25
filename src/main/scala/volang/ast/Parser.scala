@@ -72,9 +72,10 @@ class Parser(input: String) {
 
   private def parseExpression(pri: Pri.Value): Expression = {
     var left: Option[Expression] = peekToken match {
-      case _: NOT   => Some(parsePrefixExpression)
-      case _: MINUS => Some(parsePrefixExpression)
-      case others   => None
+      case _: NOT    => Some(parsePrefixExpression)
+      case _: MINUS  => Some(parsePrefixExpression)
+      case _: LPAREN => Some(parseGroupedExpression)
+      case others    => None
     }
 
     if (!left.isDefined) {
@@ -132,5 +133,12 @@ class Parser(input: String) {
       }
     }
     root
+  }
+
+  private def parseGroupedExpression: Expression = {
+    expect[LPAREN](nextToken)
+    val exp = parseExpression(Pri.lowest)
+    expect[RPAREN](nextToken)
+    exp
   }
 }

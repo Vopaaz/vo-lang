@@ -263,8 +263,8 @@ class ParserSpec extends FlatSpec with Matchers {
     val tests: List[Tuple2[String, String]] = List(
       ("(1+2)", "(1.0 + 2.0)"),
       ("1 + (2 + 3)", "(1.0 + (2.0 + 3.0))"),
-      ("1*(2+3)", "(1 * (2 + 3))"),
-      ("!(1+2)", "(!(1 + 2))")
+      ("1*(2+3)", "(1.0 * (2.0 + 3.0))"),
+      ("!(1+2)+3", "((!(1.0 + 2.0)) + 3.0)")
     )
     testInfixExpressions(tests)
   }
