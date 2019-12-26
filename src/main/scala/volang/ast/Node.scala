@@ -109,9 +109,12 @@ class IfExpression(
   }
 }
 
-class FunctionLiteral(parameters: List[Identifier], block: BlockStatement) {
+class FunctionLiteral(
+    val parameters: List[Identifier],
+    val block: BlockStatement
+) extends Expression {
   override def toString(): String = {
-    "func (" +
+    "func(" +
       parameters
         .map(x => x.value)
         .mkString(", ") +

@@ -76,6 +76,8 @@ class Parser(input: String) {
       case _: NOT    => Some(parsePrefixExpression)
       case _: MINUS  => Some(parsePrefixExpression)
       case _: LPAREN => Some(parseGroupedExpression)
+      case _: IF     => Some(parseIfExpression)
+      case _: FUNC   => Some(parseFunctionExpression)
       case others    => None
     }
 
@@ -85,7 +87,6 @@ class Parser(input: String) {
         case _: NUMBER     => Some(parseNumberLiteral)
         case _: TRUE       => Some(parseBooleanLiteral)
         case _: FALSE      => Some(parseBooleanLiteral)
-        case _: IF         => Some(parseIfExpression)
       }
     }
 
@@ -171,5 +172,26 @@ class Parser(input: String) {
     }
     expect[RBRACE](nextToken)
     new BlockStatement(buff.toList)
+  }
+
+  private def parseFunctionExpression: FunctionLiteral = {
+    expect[FUNC](nextToken)
+    new FunctionLiteral(parseFunctionParameters, parseBlockStatement)
+  }
+
+  private def parseFunctionParameters: List[Identifier] = {
+    val buff = new ListBuffer[Identifier]
+    expect[LPAREN](nextToken)
+
+    while (!peekToken.isInstanceOf[RPAREN] && !peekToken.isInstanceOf[EOF]) {
+      expect[IDENTIFIER](peekToken)
+      buff.append(new Identifier(nextToken.asInstanceOf[IDENTIFIER]))
+      if (peekToken.isInstanceOf[COMMA]) {
+        nextToken
+      }
+    }
+
+    expect[RPAREN](nextToken)
+    buff.toList
   }
 }

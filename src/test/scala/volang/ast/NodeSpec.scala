@@ -98,7 +98,7 @@ return x
         new BlockStatement(
           List(new ReturnStatement(new BooleanLiteral(new TRUE)))
         )
-      ).toString() === """func (x, y){
+      ).toString() === """func(x, y){
 return true
 }
 """
@@ -106,7 +106,7 @@ return true
 
     assert(
       new FunctionLiteral(List(), new EmptyBlockStatement)
-        .toString() === """func (){
+        .toString() === """func(){
 }
 """
     )

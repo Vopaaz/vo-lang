@@ -315,5 +315,57 @@ else {
     assert(exp.asInstanceOf[Identifier].value === "y")
   }
 
-  it should "parse function literal" in {}
+  it should "parse function literal" in {
+    val input        = """
+    func(x, y){
+      return x
+    }
+    """
+    val statementRaw = new Parser(input).parse.statements(0)
+    assert(statementRaw.isInstanceOf[ExpressionStatement])
+    val expressionRaw =
+      statementRaw.asInstanceOf[ExpressionStatement].expression
+    assert(expressionRaw.isInstanceOf[FunctionLiteral])
+    val expression = expressionRaw.asInstanceOf[FunctionLiteral]
+    expression.parameters
+      .zip(
+        List(
+          new Identifier(new IDENTIFIER("x")),
+          new Identifier(new IDENTIFIER("y"))
+        )
+      )
+      .foreach(x => {
+        assert(x._1.value === x._2.value && x._1.getClass() === x._2.getClass())
+      })
+    assert(expression.block.statements(0).isInstanceOf[ReturnStatement])
+    assert(expression.toString() === """func(x, y){
+return x
+}
+""")
+  }
+
+  it should "parse different numbers of parameters" in {
+    val input = """
+    func(){}
+    func(x){}
+    func(x,y,z){}
+    """
+
+    val expectedNum = List(0, 1, 3)
+    val statements  = new Parser(input).parse.statements
+    assert(statements.length === expectedNum.length)
+    statements
+      .zip(expectedNum)
+      .foreach(x => {
+        assert(x._1.isInstanceOf[ExpressionStatement])
+        assert(
+          x._1
+            .asInstanceOf[ExpressionStatement]
+            .expression
+            .asInstanceOf[FunctionLiteral]
+            .parameters
+            .length === x._2
+        )
+      })
+  }
 }
