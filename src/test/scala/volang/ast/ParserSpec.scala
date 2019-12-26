@@ -49,7 +49,7 @@ class ParserSpec extends FlatSpec with Matchers {
     }
   }
 
-  it should "handle empty lines correctly" in {
+  it should "handle empty lines" in {
     val input = """
 
 
@@ -202,7 +202,7 @@ class ParserSpec extends FlatSpec with Matchers {
     })
   }
 
-  it should "parse complex infix expression correctly" in {
+  it should "parse complex infix expression" in {
     val tests = List[Tuple2[String, String]](
       ("-a*b", "((-a) * b)"),
       ("!-a + b", "((!(-a)) + b)"),
@@ -220,7 +220,7 @@ class ParserSpec extends FlatSpec with Matchers {
     testInfixExpressions(tests)
   }
 
-  it should "parse multiple infix expressions correctly" in {
+  it should "parse multiple infix expressions" in {
     val input      = """
     1+2
     1+2
@@ -259,7 +259,7 @@ class ParserSpec extends FlatSpec with Matchers {
     assert(exp2.asInstanceOf[BooleanLiteral].value == true)
   }
 
-  it should "parse grouped expressions correctly" in {
+  it should "parse grouped expressions" in {
     val tests: List[Tuple2[String, String]] = List(
       ("(1+2)", "(1.0 + 2.0)"),
       ("1 + (2 + 3)", "(1.0 + (2.0 + 3.0))"),
@@ -269,7 +269,7 @@ class ParserSpec extends FlatSpec with Matchers {
     testInfixExpressions(tests)
   }
 
-  it should "parse if expression, without else, correctly" in {
+  it should "parse if expression without else" in {
     val input        = "if(x>y){x}"
     val statementRaw = new Parser(input).parse.statements(0)
     assert(statementRaw.isInstanceOf[ExpressionStatement])
@@ -300,8 +300,8 @@ else {
 """)
   }
 
-  it should "parse if statement with else correctly" in {
-    val input = "if (x<y) {x} else {y}"
+  it should "parse if statement with else branch" in {
+    val input        = "if (x<y) {x} else {y}"
     val statementRaw = new Parser(input).parse.statements(0)
     assert(statementRaw.isInstanceOf[ExpressionStatement])
     val expressionRaw =
@@ -309,8 +309,11 @@ else {
     assert(expressionRaw.isInstanceOf[IfExpression])
     val elseBlock = expressionRaw.asInstanceOf[IfExpression].elseBlock
     assert(elseBlock.statements(0).isInstanceOf[ExpressionStatement])
-    val exp = elseBlock.statements(0).asInstanceOf[ExpressionStatement].expression
+    val exp =
+      elseBlock.statements(0).asInstanceOf[ExpressionStatement].expression
     assert(exp.isInstanceOf[Identifier])
     assert(exp.asInstanceOf[Identifier].value === "y")
   }
+
+  it should "parse function literal" in {}
 }

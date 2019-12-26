@@ -13,12 +13,12 @@ class NodeSpec extends FlatSpec {
     )
   }
 
-  "PrefixExpression" should "print results correctly" in {
+  "PrefixExpression" should "print results" in {
     val exp = new PrefixExpression(new MINUS, new NumberLiteral(new NUMBER(1)))
     assert(exp.toString() === "(-1.0)")
   }
 
-  "InfixExpression" should "print simple results correctly" in {
+  "InfixExpression" should "print simple results" in {
     val exp = new InfixExpression(
       new NumberLiteral(new NUMBER(1)),
       new PLUS,
@@ -27,7 +27,7 @@ class NodeSpec extends FlatSpec {
     assert(exp.toString() === "(1.0 + 2.0)")
   }
 
-  it should "print complex results correctly" in {
+  it should "print complex results" in {
     val expInner = new InfixExpression(
       new NumberLiteral(new NUMBER(1)),
       new PLUS,
@@ -41,7 +41,7 @@ class NodeSpec extends FlatSpec {
     assert(exp.toString() === "((1.0 + 2.0) - (1.0 + 2.0))")
   }
 
-  "BlockStatement" should "print contents correctly" in {
+  "BlockStatement" should "print contents" in {
     assert(
       new BlockStatement(
         List[Statement](
@@ -59,13 +59,13 @@ let x = true
     )
   }
 
-  it should "print empty block statements correctly" in {
+  it should "print empty block statements" in {
     assert(new BlockStatement(List()).toString() === """{
 }
 """)
   }
 
-  "IfExpression" should "print contents correctly" in {
+  "IfExpression" should "print contents" in {
     assert(
       new IfExpression(
         new BooleanLiteral(new TRUE),
@@ -88,7 +88,7 @@ return x
     )
   }
 
-  "FunctionLiteral" should "print contents correctly" in {
+  "FunctionLiteral" should "print contents" in {
     assert(
       new FunctionLiteral(
         List(
