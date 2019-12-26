@@ -2,6 +2,7 @@ package volang.ast
 
 import volang.lexer._
 import scala.reflect._
+import scala.collection.mutable._
 
 object Pri extends Enumeration {
   val lowest, ==, ><, +-, */, prefix, call = Value
@@ -84,6 +85,7 @@ class Parser(input: String) {
         case _: NUMBER     => Some(parseNumberLiteral)
         case _: TRUE       => Some(parseBooleanLiteral)
         case _: FALSE      => Some(parseBooleanLiteral)
+        case _: IF         => Some(parseIfExpression)
       }
     }
 
@@ -140,5 +142,27 @@ class Parser(input: String) {
     val exp = parseExpression(Pri.lowest)
     expect[RPAREN](nextToken)
     exp
+  }
+
+  private def parseIfExpression: IfExpression = {
+    expect[IF](nextToken)
+    expect[LPAREN](nextToken)
+    val condition = parseExpression(Pri.lowest)
+    expect[RPAREN](nextToken)
+    val thenBlock = parseBlockStatement
+    new IfExpression(condition, thenBlock)
+  }
+
+  private def parseBlockStatement: BlockStatement = {
+    val buff = new ListBuffer[Statement]
+    expect[LBRACE](nextToken)
+    while (!peekToken.isInstanceOf[RBRACE] && !peekToken.isInstanceOf[EOF]) {
+      val stmt = parseStatement
+      if (stmt.isDefined) {
+        buff.append(stmt.get)
+      }
+    }
+    expect[RBRACE](nextToken)
+    new BlockStatement(buff.toList)
   }
 }

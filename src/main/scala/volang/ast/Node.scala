@@ -85,3 +85,26 @@ class InfixExpression(
     s"(${left.toString} ${operatorToken.literal.toString} ${right.toString})"
   }
 }
+
+class BlockStatement(val statements: List[Statement]) extends Statement {
+  override def toString(): String = {
+    "{\n" +
+      statements
+        .map(x => x.toString)
+        .foldLeft("")((x, y) => x.concat(y)) +
+      "}\n"
+  }
+}
+
+class EmptyBlockStatement extends BlockStatement(List())
+
+class IfExpression(
+    val condition: Expression,
+    val thenBlock: BlockStatement,
+    val elseBlock: BlockStatement = new EmptyBlockStatement
+) extends Expression {
+  override def toString(): String = {
+    "if " + condition.toString() + "\nthen " + thenBlock
+      .toString() + "else " + elseBlock.toString()
+  }
+}

@@ -268,4 +268,37 @@ class ParserSpec extends FlatSpec with Matchers {
     )
     testInfixExpressions(tests)
   }
+
+  it should "parse if expression, without else, correctly" in {
+    val input        = "if(x>y){x}"
+    val statementRaw = new Parser(input).parse.statements(0)
+    assert(statementRaw.isInstanceOf[ExpressionStatement])
+    val expressionRaw =
+      statementRaw.asInstanceOf[ExpressionStatement].expression
+    assert(expressionRaw.isInstanceOf[IfExpression])
+    val exp = expressionRaw.asInstanceOf[IfExpression]
+    assert(exp.condition.isInstanceOf[InfixExpression])
+    assert(exp.condition.asInstanceOf[InfixExpression].toString === "(x > y)")
+    val thenStmt = exp.thenBlock.statements(0)
+    assert(
+      thenStmt
+        .isInstanceOf[ExpressionStatement]
+    )
+    assert(
+      thenStmt
+        .asInstanceOf[ExpressionStatement]
+        .expression
+        .isInstanceOf[Identifier]
+    )
+    assert(exp.elseBlock.isInstanceOf[EmptyBlockStatement])
+    assert(exp.toString() === """if (x > y)
+then {
+x
+}
+else {
+}
+""")
+  }
+
+  it should "parse if statement with else correctly" in {}
 }

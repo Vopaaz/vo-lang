@@ -40,4 +40,51 @@ class NodeSpec extends FlatSpec {
     )
     assert(exp.toString() === "((1.0 + 2.0) - (1.0 + 2.0))")
   }
+
+  "BlockStatement" should "print contents correctly" in {
+    assert(
+      new BlockStatement(
+        List[Statement](
+          new ExpressionStatement(new NumberLiteral(new NUMBER(1))),
+          new LetStatement(
+            new Identifier(new IDENTIFIER("x")),
+            new BooleanLiteral(new TRUE)
+          )
+        )
+      ).toString === """{
+1.0
+let x = true
+}
+"""
+    )
+  }
+
+  it should "print empty block statements correctly" in {
+    assert(new BlockStatement(List()).toString() === """{
+}
+""")
+  }
+
+  "IfExpression" should "print contents correctly" in {
+    assert(
+      new IfExpression(
+        new BooleanLiteral(new TRUE),
+        new BlockStatement(
+          List[Statement](new ReturnStatement(new NumberLiteral(new NUMBER(2))))
+        ),
+        new BlockStatement(
+          List[Statement](
+            new ReturnStatement(new Identifier(new IDENTIFIER("x")))
+          )
+        )
+      ).toString === """if true
+then {
+return 2.0
+}
+else {
+return x
+}
+"""
+    )
+  }
 }
