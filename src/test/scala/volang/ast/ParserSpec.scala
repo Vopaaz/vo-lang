@@ -300,5 +300,17 @@ else {
 """)
   }
 
-  it should "parse if statement with else correctly" in {}
+  it should "parse if statement with else correctly" in {
+    val input = "if (x<y) {x} else {y}"
+    val statementRaw = new Parser(input).parse.statements(0)
+    assert(statementRaw.isInstanceOf[ExpressionStatement])
+    val expressionRaw =
+      statementRaw.asInstanceOf[ExpressionStatement].expression
+    assert(expressionRaw.isInstanceOf[IfExpression])
+    val elseBlock = expressionRaw.asInstanceOf[IfExpression].elseBlock
+    assert(elseBlock.statements(0).isInstanceOf[ExpressionStatement])
+    val exp = elseBlock.statements(0).asInstanceOf[ExpressionStatement].expression
+    assert(exp.isInstanceOf[Identifier])
+    assert(exp.asInstanceOf[Identifier].value === "y")
+  }
 }

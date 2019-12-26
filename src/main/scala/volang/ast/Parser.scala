@@ -150,7 +150,14 @@ class Parser(input: String) {
     val condition = parseExpression(Pri.lowest)
     expect[RPAREN](nextToken)
     val thenBlock = parseBlockStatement
-    new IfExpression(condition, thenBlock)
+
+    if (peekToken.isInstanceOf[ELSE]) {
+      nextToken
+      val elseBlock = parseBlockStatement
+      new IfExpression(condition, thenBlock, elseBlock)
+    } else {
+      new IfExpression(condition, thenBlock)
+    }
   }
 
   private def parseBlockStatement: BlockStatement = {
