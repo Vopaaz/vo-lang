@@ -91,7 +91,7 @@ class BlockStatement(val statements: List[Statement]) extends Statement {
     "{\n" +
       statements
         .map(x => x.toString)
-        .foldLeft("")((x, y) => x.concat(y)) +
+        .mkString +
       "}\n"
   }
 }
@@ -106,5 +106,15 @@ class IfExpression(
   override def toString(): String = {
     "if " + condition.toString() + "\nthen " + thenBlock
       .toString() + "else " + elseBlock.toString()
+  }
+}
+
+class FunctionLiteral(parameters: List[Identifier], block: BlockStatement) {
+  override def toString(): String = {
+    "func (" +
+      parameters
+        .map(x => x.value)
+        .mkString(", ") +
+      ")" + block.toString()
   }
 }

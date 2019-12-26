@@ -87,4 +87,28 @@ return x
 """
     )
   }
+
+  "FunctionLiteral" should "print contents correctly" in {
+    assert(
+      new FunctionLiteral(
+        List(
+          new Identifier(new IDENTIFIER("x")),
+          new Identifier(new IDENTIFIER("y"))
+        ),
+        new BlockStatement(
+          List(new ReturnStatement(new BooleanLiteral(new TRUE)))
+        )
+      ).toString() === """func (x, y){
+return true
+}
+"""
+    )
+
+    assert(
+      new FunctionLiteral(List(), new EmptyBlockStatement)
+        .toString() === """func (){
+}
+"""
+    )
+  }
 }
