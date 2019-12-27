@@ -410,4 +410,13 @@ return x
 
       })
   }
+
+  it should "parse call expressions along with other operators" in {
+    val input = "a + f(b*c, d) + e"
+    val statementRaw = new Parser(input).parse.statements(0)
+    assert(statementRaw.isInstanceOf[ExpressionStatement])
+    val expressionRaw = statementRaw.asInstanceOf[ExpressionStatement].expression
+    assert(expressionRaw.isInstanceOf[InfixExpression])
+    assert(expressionRaw.toString() === "((a + f((b * c), d)) + e)")
+  }
 }
