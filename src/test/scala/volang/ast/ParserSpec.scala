@@ -412,11 +412,72 @@ return x
   }
 
   it should "parse call expressions along with other operators" in {
-    val input = "a + f(b*c, d) + e"
+    val input        = "a + f(b*c, d) + e"
     val statementRaw = new Parser(input).parse.statements(0)
     assert(statementRaw.isInstanceOf[ExpressionStatement])
-    val expressionRaw = statementRaw.asInstanceOf[ExpressionStatement].expression
+    val expressionRaw =
+      statementRaw.asInstanceOf[ExpressionStatement].expression
     assert(expressionRaw.isInstanceOf[InfixExpression])
     assert(expressionRaw.toString() === "((a + f((b * c), d)) + e)")
+  }
+
+  it should "parse let statements with complex right values" in {
+    val input = """
+    let a = 1+1
+    let b = a
+    let c = func(){}
+    """
+
+    val statements = new Parser(input).parse.statements
+    val expectedExpressions = List[Expression](
+      new InfixExpression(
+        new NumberLiteral(new NUMBER(1)),
+        new PLUS,
+        new NumberLiteral(new NUMBER(1))
+      ),
+      new Identifier(new IDENTIFIER("a")),
+      new FunctionLiteral(List(), new BlockStatement(List()))
+    )
+    statements
+      .zip(expectedExpressions)
+      .foreach(x => {
+        val statementRaw       = x._1
+        val expectedExpression = x._2
+        assert(statementRaw.isInstanceOf[LetStatement])
+        val expressionRaw = statementRaw.asInstanceOf[LetStatement].expression
+        assert(expressionRaw.getClass() === expectedExpression.getClass())
+        assert(expressionRaw.toString() === expectedExpression.toString())
+      })
+  }
+
+  it should "parse complex return statements" in {
+    val input = """
+    return func(){}
+    return 1*1
+    return foo
+    """
+
+    val expectedExpressions = List[Expression](
+      new FunctionLiteral(List(), new BlockStatement(List())),
+      new InfixExpression(
+        new NumberLiteral(new NUMBER(1)),
+        new TIMES,
+        new NumberLiteral(new NUMBER(1))
+      ),
+      new Identifier(new IDENTIFIER("foo"))
+    )
+
+    val statements = new Parser(input).parse.statements
+    statements
+      .zip(expectedExpressions)
+      .foreach(x => {
+        val statementRaw       = x._1
+        val expectedExpression = x._2
+        assert(statementRaw.isInstanceOf[ReturnStatement])
+        val expressionRaw =
+          statementRaw.asInstanceOf[ReturnStatement].expression
+        assert(expressionRaw.getClass() === expectedExpression.getClass())
+        assert(expressionRaw.toString() === expectedExpression.toString())
+      })
   }
 }
