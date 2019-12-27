@@ -1,7 +1,6 @@
 package volang.lexer
 
 import org.scalatest.FlatSpec
-import scala.language.experimental
 
 class LexerSpec extends FlatSpec {
 
