@@ -20,6 +20,7 @@ object Pri extends Enumeration {
       case _: TIMES  => Pri.*/
       case _: DIVIDE => Pri.*/
       case _: NOT    => Pri.prefix
+      case _: LPAREN => Pri.call
       case others    => Pri.lowest
     }
   }
@@ -92,7 +93,10 @@ class Parser(input: String) {
 
     while (!peekToken.isInstanceOf[LINEFEED] && !peekToken
              .isInstanceOf[EOF] && pri < Pri.of(peekToken)) {
-      left = Some(parseInfixExpression(left.get))
+      left = peekToken match {
+        case _: LPAREN => Some(parseCallExpression(left.get))
+        case other     => Some(parseInfixExpression(left.get))
+      }
     }
 
     left.getOrElse(new Expression)
@@ -191,6 +195,24 @@ class Parser(input: String) {
       }
     }
 
+    expect[RPAREN](nextToken)
+    buff.toList
+  }
+
+  private def parseCallExpression(function: Expression): CallExpression = {
+    new CallExpression(function, parseCallArguments)
+  }
+
+  private def parseCallArguments: List[Expression] = {
+    val buff = new ListBuffer[Expression]
+    expect[LPAREN](nextToken)
+    if (!peekToken.isInstanceOf[RPAREN]) {
+      buff.append(parseExpression(Pri.lowest))
+      while (peekToken.isInstanceOf[COMMA]) {
+        nextToken
+        buff.append(parseExpression(Pri.lowest))
+      }
+    }
     expect[RPAREN](nextToken)
     buff.toList
   }

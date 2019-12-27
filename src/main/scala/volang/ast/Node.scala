@@ -121,3 +121,14 @@ class FunctionLiteral(
       ")" + block.toString()
   }
 }
+
+class CallExpression(val function: Expression, val arguments: List[Expression])
+    extends Expression {
+  assert(
+    function.isInstanceOf[FunctionLiteral] || function.isInstanceOf[Identifier]
+  )
+  override def toString(): String = {
+    function
+      .toString() + "(" + arguments.map(x => x.toString()).mkString(", ") + ")"
+  }
+}

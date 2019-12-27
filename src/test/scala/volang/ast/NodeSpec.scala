@@ -111,4 +111,22 @@ return true
 """
     )
   }
+
+  "CallExpression" should "print contents" in {
+    assert(
+      new CallExpression(
+        new FunctionLiteral(List(), new BlockStatement(List())),
+        List()
+      ).toString() === """func(){
+}
+()"""
+    )
+
+    assert(
+      new CallExpression(
+        new Identifier(new IDENTIFIER("f")),
+        List(new NumberLiteral(new NUMBER(1)), new BooleanLiteral(new TRUE))
+      ).toString() === """f(1.0, true)"""
+    )
+  }
 }

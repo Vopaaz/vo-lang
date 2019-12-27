@@ -344,7 +344,7 @@ return x
 """)
   }
 
-  it should "parse different numbers of parameters" in {
+  it should "parse different numbers of parameters when parsing function literal" in {
     val input = """
     func(){}
     func(x){}
@@ -366,6 +366,48 @@ return x
             .parameters
             .length === x._2
         )
+      })
+  }
+
+  it should "parse call expressions using identifiers" in {
+    val input = """
+    f()
+    f(1)
+    f(a, 1+2)
+    """
+
+    val expectedArgs = List[List[Expression]](
+      List(),
+      List(new NumberLiteral(new NUMBER(1))),
+      List(
+        new Identifier(new IDENTIFIER("a")),
+        new InfixExpression(
+          new NumberLiteral(new NUMBER(1)),
+          new PLUS,
+          new NumberLiteral(new NUMBER(2))
+        )
+      )
+    )
+
+    val statements = new Parser(input).parse.statements
+    assert(statements.length == 3)
+    statements
+      .zip(expectedArgs)
+      .foreach(x => {
+        assert(x._1.isInstanceOf[ExpressionStatement])
+        val expRaw = x._1.asInstanceOf[ExpressionStatement].expression
+        assert(expRaw.isInstanceOf[CallExpression])
+        val exp = expRaw.asInstanceOf[CallExpression]
+        assert(exp.function.isInstanceOf[Identifier])
+        assert(exp.function.asInstanceOf[Identifier].value === "f")
+
+        exp.arguments
+          .zip(x._2)
+          .foreach(y => {
+            assert(y._1.getClass() === y._2.getClass())
+            assert(y._1.toString() === y._2.toString())
+          })
+
       })
   }
 }
