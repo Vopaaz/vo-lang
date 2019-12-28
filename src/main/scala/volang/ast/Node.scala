@@ -77,6 +77,13 @@ class BooleanLiteral(val token: TokenType) extends Expression {
   }
 }
 
+class NoneLiteral(val token: NONE) extends Expression {
+  val value = None
+  override def toString(): String = {
+    "none"
+  }
+}
+
 class PrefixExpression(val operatorToken: TokenType, val right: Expression)
     extends Expression {
   override def toString(): String = {

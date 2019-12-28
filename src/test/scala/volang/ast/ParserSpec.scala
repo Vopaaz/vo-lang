@@ -104,6 +104,14 @@ class ParserSpec extends FlatSpec with Matchers {
     assert(expression.toString === "5.5")
   }
 
+  it should "parse none literal" in {
+    val statementRaw = new Parser("none").parse.statements.head
+    assert(statementRaw.isInstanceOf[ExpressionStatement])
+    val expressionRaw =
+      statementRaw.asInstanceOf[ExpressionStatement].expression
+    assert(expressionRaw.isInstanceOf[NoneLiteral])
+  }
+
   it should "parse prefix expression, decorating numbers, statement" in {
     val input = """
     -5

@@ -8,6 +8,7 @@ object Evaluator {
       case stmt: Statement       => evalStatement(stmt)
       case number: NumberLiteral => new VoNumber(number.value)
       case bool: BooleanLiteral  => new VoBoolean(bool.value)
+      case none: NoneLiteral     => new VoNone
     }
   }
 
