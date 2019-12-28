@@ -99,7 +99,11 @@ class Parser(input: String) {
       }
     }
 
-    left.getOrElse(new Expression)
+    if (left.isDefined) {
+      left.get
+    } else {
+      throw new ParsingException("Parsing error, no expression defined.")
+    }
   }
 
   private def parseExpressionStatement: ExpressionStatement = {
@@ -136,7 +140,7 @@ class Parser(input: String) {
     while (!peekToken.isInstanceOf[EOF]) {
       val s = parseStatement
       if (s.isDefined) {
-        root.statements.append(s.get)
+        root.append(s.get)
       }
     }
     root

@@ -4,9 +4,9 @@ import scala.collection.mutable._
 
 abstract class Node
 
-class Statement extends Node
+abstract class Statement extends Node
 
-class Expression extends Node
+abstract class Expression extends Node
 
 class SingleLiteralExpression(val token: TokenType) extends Expression {
   override def toString(): String = {
@@ -15,7 +15,7 @@ class SingleLiteralExpression(val token: TokenType) extends Expression {
 }
 
 class Root(val src: String) extends Node {
-  val statements = new ListBuffer[Statement]
+  private val _statements = new ListBuffer[Statement]
   override def toString(): String = {
     val buff = new StringBuilder(s"---Source---\n$src\n---Statements---\n")
     statements.foreach(x => {
@@ -23,6 +23,14 @@ class Root(val src: String) extends Node {
     })
     buff.append("\n---------\n")
     buff.mkString
+  }
+
+  def append(statement: Statement) = {
+    _statements.append(statement)
+  }
+
+  def statements: List[Statement] = {
+    _statements.toList
   }
 }
 
