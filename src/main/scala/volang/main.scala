@@ -6,6 +6,6 @@ import volang.repl.ReadLoop
 
 object Main {
   def main(args: Array[String]) = {
-    ReadLoop.startRPPL
+    ReadLoop.startREPL
   }
 }

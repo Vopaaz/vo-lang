@@ -1,6 +1,7 @@
 package volang.repl
 import volang.lexer._
 import volang.ast.Parser
+import volang.eval.Evaluator
 
 object ReadLoop {
   private val prompt = "> "
@@ -31,6 +32,20 @@ object ReadLoop {
       val s          = io.StdIn.readLine()
       val statements = new Parser(s).parse.statements
       statements.foreach(println)
+    }
+  }
+
+  def startREPL: Unit = {
+
+    /** Read-Evaluation-Print-Loop
+      */
+    while (true) {
+      print(prompt)
+      Console.flush()
+
+      val s    = io.StdIn.readLine()
+      val root = new Parser(s).parse
+      println(Evaluator.evaluate(root))
     }
   }
 }
