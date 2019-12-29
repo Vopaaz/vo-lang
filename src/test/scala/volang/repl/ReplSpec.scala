@@ -1,7 +1,64 @@
 package volang.repl
 
 import org.scalatest.FlatSpec
+import scala.io._
+import java.io.StringBufferInputStream
+import java.io.ByteArrayOutputStream
 
 class LexerSpec extends FlatSpec {
-  "Repl" should "TODO: NO TEST" in {}
+  "Testing Suite" should "work" in {
+    val s  = "in"
+    val in = new StringBufferInputStream(s)
+
+    Console.withIn(in) {
+      assert(StdIn.readLine() === s)
+    }
+
+    val out = new ByteArrayOutputStream()
+    Console.withOut(out) {
+      print(s)
+      assert(out.toString() === s)
+    }
+  }
+
+  "ReadLoop" should "exit when user input quit" in {
+    var in = new StringBufferInputStream(":q")
+    Console.withIn(in) {
+      ReadLoop.startREPL
+    }
+
+    in = new StringBufferInputStream(":exit")
+    Console.withIn(in) {
+      ReadLoop.startRLPL
+    }
+
+    in = new StringBufferInputStream(":quit")
+    Console.withIn(in) {
+      ReadLoop.startRPPL
+    }
+  }
+
+  it should "run smoothly in basic inputs" in {
+    val input = """
+    1
+    !true
+    -2
+    :q
+    """
+
+    var in = new StringBufferInputStream(input)
+    Console.withIn(in) {
+      ReadLoop.startREPL
+    }
+
+    in = new StringBufferInputStream(input)
+    Console.withIn(in) {
+      ReadLoop.startRLPL
+    }
+
+    in = new StringBufferInputStream(input)
+    Console.withIn(in) {
+      ReadLoop.startRPPL
+    }
+  }
 }

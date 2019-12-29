@@ -17,7 +17,7 @@ object ReadLoop {
         Console.flush()
 
         val s = io.StdIn.readLine()
-        if (exit.contains(s)) {
+        if (exit.contains(s.trim())) {
           break
         }
         val l = new Lexer(s)
@@ -38,7 +38,7 @@ object ReadLoop {
         Console.flush()
 
         val s = io.StdIn.readLine()
-        if (exit.contains(s)) {
+        if (exit.contains(s.trim())) {
           break
         }
         val statements = new Parser(s).parse.statements
@@ -57,7 +57,7 @@ object ReadLoop {
         Console.flush()
 
         val s = io.StdIn.readLine()
-        if (exit.contains(s)) {
+        if (exit.contains(s.trim())) {
           break
         }
         val root = new Parser(s).parse
