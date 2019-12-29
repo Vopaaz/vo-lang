@@ -1,15 +1,15 @@
 package volang.eval
 
-abstract class VoObject
+abstract class VoObject(val value: Any)
 
-class VoNumber(val value: Double) extends VoObject {
+class VoNumber(override val value: Double) extends VoObject {
   val typeName = "Number"
   override def toString(): String = {
     value.toString()
   }
 }
 
-class VoBoolean(val value: Boolean) extends VoObject {
+class VoBoolean(override val value: Boolean) extends VoObject {
   val typeName = "Boolean"
   override def toString(): String = {
     value.toString()
@@ -17,7 +17,7 @@ class VoBoolean(val value: Boolean) extends VoObject {
 }
 
 class VoNone extends VoObject {
-  val value = None
+  override val value = None
   override def toString(): String = {
     "none"
   }
