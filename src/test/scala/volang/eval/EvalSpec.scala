@@ -39,4 +39,37 @@ class EvalSpec extends FlatSpec {
     val obj   = Evaluator.evaluate(root)
     assert(obj.isInstanceOf[VoNone])
   }
+
+  it should "evaluate prefix expression for '!'" in {
+    val inputExpected = List(
+      ("!true", false),
+      ("!!true", true),
+      ("!!false", false),
+      ("!1", false),
+      ("!0", true),
+      ("!!0", false)
+    )
+
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(obj.isInstanceOf[VoBoolean])
+      assert(obj.asInstanceOf[VoBoolean].value == x._2)
+    })
+  }
+
+  it should "evaluate prefix expression for '-'" in {
+    val inputExpected = List(
+      ("-1", -1),
+      ("--2", 2),
+      ("-0", 0)
+    )
+
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(obj.isInstanceOf[VoNumber])
+      assert(obj.asInstanceOf[VoNumber].value == x._2)
+    })
+  }
 }
