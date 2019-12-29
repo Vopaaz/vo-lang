@@ -2,21 +2,28 @@ package volang.repl
 import volang.lexer._
 import volang.ast.Parser
 import volang.eval.Evaluator
+import scala.util.control.Breaks._
 
 object ReadLoop {
   private val prompt = "> "
+  private val exit   = List(":q", ":quit", ":exit")
   def startRLPL: Unit = {
 
     /** Read-Lex-Print-Loop
       */
-    while (true) {
-      print(prompt)
-      Console.flush()
+    breakable {
+      while (true) {
+        print(prompt)
+        Console.flush()
 
-      val s = io.StdIn.readLine()
-      val l = new Lexer(s)
-      while (l.hasNext) {
-        println(l.nextToken.toString)
+        val s = io.StdIn.readLine()
+        if (exit.contains(s)) {
+          break
+        }
+        val l = new Lexer(s)
+        while (l.hasNext) {
+          println(l.nextToken.toString)
+        }
       }
     }
   }
@@ -25,13 +32,18 @@ object ReadLoop {
 
     /** Read-Parse-Print-Loop
       */
-    while (true) {
-      print(prompt)
-      Console.flush()
+    breakable {
+      while (true) {
+        print(prompt)
+        Console.flush()
 
-      val s          = io.StdIn.readLine()
-      val statements = new Parser(s).parse.statements
-      statements.foreach(println)
+        val s = io.StdIn.readLine()
+        if (exit.contains(s)) {
+          break
+        }
+        val statements = new Parser(s).parse.statements
+        statements.foreach(println)
+      }
     }
   }
 
@@ -39,13 +51,18 @@ object ReadLoop {
 
     /** Read-Evaluation-Print-Loop
       */
-    while (true) {
-      print(prompt)
-      Console.flush()
+    breakable {
+      while (true) {
+        print(prompt)
+        Console.flush()
 
-      val s    = io.StdIn.readLine()
-      val root = new Parser(s).parse
-      println(Evaluator.evaluate(root))
+        val s = io.StdIn.readLine()
+        if (exit.contains(s)) {
+          break
+        }
+        val root = new Parser(s).parse
+        println(Evaluator.evaluate(root))
+      }
     }
   }
 }
