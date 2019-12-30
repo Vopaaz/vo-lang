@@ -5,7 +5,7 @@ import scala.io._
 import java.io.StringBufferInputStream
 import java.io.ByteArrayOutputStream
 
-class LexerSpec extends FlatSpec {
+class ReplSpec extends FlatSpec {
   "Testing Suite" should "work" in {
     val s  = "in"
     val in = new StringBufferInputStream(s)
