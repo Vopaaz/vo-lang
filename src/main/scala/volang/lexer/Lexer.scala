@@ -11,13 +11,11 @@ class Lexer(input: String) {
   }
 
   private def peekChar: Char = {
-    var c: Char = NULL_CHAR
     if (position < input.length()) {
-      c = input.charAt(position)
+      input.charAt(position)
     } else {
-      c = NULL_CHAR
+      NULL_CHAR
     }
-    c
   }
 
   private def nextChar: Char = {

@@ -128,9 +128,8 @@ class Parser(input: String) {
   }
 
   private def parsePrefixExpression: PrefixExpression = {
-    val token = nextToken
     new PrefixExpression(
-      token,
+      nextToken,
       parseExpression(Pri.prefix)
     )
   }

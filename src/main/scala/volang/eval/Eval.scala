@@ -16,7 +16,7 @@ object Evaluator {
   }
 
   private def evalStatements(statements: List[Statement]): VoObject = {
-    statements.map(x => evalStatement(x)).lastOption.getOrElse(new VoNone)
+    statements.map(evalStatement).lastOption.getOrElse(new VoNone)
   }
 
   private def evalStatement(statement: Statement): VoObject = {
