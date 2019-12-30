@@ -90,4 +90,23 @@ class EvalSpec extends FlatSpec {
       assert(obj.asInstanceOf[VoBoolean].value == x._2)
     })
   }
+
+  it should "evaluate number arithmetic expression" in {
+    val inputExpected = List(
+      ("1+1", 2),
+      ("2*5 -1", 9),
+      ("10 - 2/2", 9),
+      ("(1+1) * 10", 20),
+      ("1/10", 0.1),
+      ("(1+(-2))/10", -0.1),
+      ("(1+-1)/10", 0.0)
+    )
+
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(obj.isInstanceOf[VoNumber])
+      assert(obj.asInstanceOf[VoNumber].value == x._2)
+    })
+  }
 }

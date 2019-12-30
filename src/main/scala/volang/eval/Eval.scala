@@ -65,6 +65,18 @@ object Evaluator {
       case _: NEQ => {
         evaluate(expression.left) != evaluate(expression.right)
       }
+      case _: PLUS => {
+        evaluate(expression.left) + evaluate(expression.right)
+      }
+      case _: MINUS => {
+        evaluate(expression.left) - evaluate(expression.right)
+      }
+      case _: TIMES => {
+        evaluate(expression.left) * evaluate(expression.right)
+      }
+      case _: DIVIDE => {
+        evaluate(expression.left) / evaluate(expression.right)
+      }
     }
   }
 }

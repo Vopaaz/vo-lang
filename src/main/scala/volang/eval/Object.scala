@@ -77,9 +77,24 @@ class VoNumber(override val value: Double) extends VoObject {
     })
   }
 
+  override def +(other: VoObject): VoNumber = {
+    assert(other.isInstanceOf[VoNumber])
+    new VoNumber(value + other.asInstanceOf[VoNumber].value)
+  }
+
   override def -(other: VoObject): VoNumber = {
     assert(other.isInstanceOf[VoNumber])
     new VoNumber(value - other.asInstanceOf[VoNumber].value)
+  }
+
+  override def *(other: VoObject): VoNumber = {
+    assert(other.isInstanceOf[VoNumber])
+    new VoNumber(value * other.asInstanceOf[VoNumber].value)
+  }
+
+  override def /(other: VoObject): VoNumber = {
+    assert(other.isInstanceOf[VoNumber])
+    new VoNumber(value / other.asInstanceOf[VoNumber].value)
   }
 }
 
