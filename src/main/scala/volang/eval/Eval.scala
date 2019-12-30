@@ -1,9 +1,20 @@
 package volang.eval
+
 import volang.ast._
 import volang.lexer._
+import scala.util.control.Breaks._
 
 object Evaluator {
   def evaluate(node: Node): VoObject = {
+    try {
+      _evaluate(node)
+    } catch {
+      case x: UndefinedOperatorException => new VoError(x.message)
+      case x: AssertionError             => new VoError(x.getMessage())
+    }
+  }
+
+  def _evaluate(node: Node): VoObject = {
     node match {
       case x: Root             => evalStatements(x.statements)
       case x: NumberLiteral    => new VoNumber(x.value)
@@ -17,7 +28,18 @@ object Evaluator {
   }
 
   private def evalStatements(statements: List[Statement]): VoObject = {
-    statements.map(evalStatement).lastOption.getOrElse(new VoNone)
+    var obj: VoObject = new VoNone
+
+    breakable {
+      for (statement <- statements) {
+        obj = evalStatement(statement)
+        if (obj.isInstanceOf[VoError]) {
+          break
+        }
+      }
+    }
+
+    obj
   }
 
   private def evalStatement(statement: Statement): VoObject = {

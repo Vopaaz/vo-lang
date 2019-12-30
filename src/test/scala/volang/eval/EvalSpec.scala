@@ -123,7 +123,7 @@ class EvalSpec extends FlatSpec {
       }
       """, 1),
       ("if(1){1}", 1),
-      ("if(0){0}else{1}",1)
+      ("if(0){0}else{1}", 1)
     )
 
     inputExpected.foreach(x => {
@@ -133,7 +133,29 @@ class EvalSpec extends FlatSpec {
       assert(obj.asInstanceOf[VoNumber].value == x._2)
     })
     assert(
-      Evaluator.evaluate(new Parser("if(false){1}").parse).typeName === "None"
+      Evaluator.evaluate(new Parser("if(false){1}").parse).isInstanceOf[VoNone]
     )
+  }
+
+  it should "return VoError object when encounter error" in {
+    assert(Evaluator.evaluate(new Parser("1+true").parse).isInstanceOf[VoError])
+  }
+
+  it should "stop evaluating a set of statements when encounter error" in {
+    List("""
+      9
+      5
+      1+true
+      10
+      """, """
+      if(1>0){
+        3
+        12
+        1+true
+        5
+      }
+      """).foreach(x => {
+      assert(Evaluator.evaluate(new Parser(x).parse).isInstanceOf[VoError])
+    })
   }
 }

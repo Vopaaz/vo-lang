@@ -144,3 +144,11 @@ class VoNone extends VoObject {
     new VoBoolean(false)
   }
 }
+
+class VoError(val message: String) extends VoObject {
+  override val value: Any       = None
+  override val typeName: String = "Error"
+  override def toString(): String = {
+    message
+  }
+}
