@@ -47,24 +47,23 @@ object Evaluator {
 
   private def evalInfixExpression(expression: InfixExpression): VoObject = {
     expression.operatorToken match {
-      case _: EQ =>
-        new VoBoolean(
-          evaluate(expression.left).value == evaluate(expression.right).value
-        )
+      case _: EQ => {
+        evaluate(expression.left) == evaluate(expression.right)
+      }
       case _: GEQ => {
-        new VoBoolean(evaluate(expression.left) >= evaluate(expression.right))
+        evaluate(expression.left) >= evaluate(expression.right)
       }
       case _: LEQ => {
-        new VoBoolean(evaluate(expression.left) <= evaluate(expression.right))
+        evaluate(expression.left) <= evaluate(expression.right)
       }
       case _: GT => {
-        new VoBoolean(evaluate(expression.left) > evaluate(expression.right))
+        evaluate(expression.left) > evaluate(expression.right)
       }
       case _: LT => {
-        new VoBoolean(evaluate(expression.left) < evaluate(expression.right))
+        evaluate(expression.left) < evaluate(expression.right)
       }
       case _: NEQ => {
-        new VoBoolean(evaluate(expression.left) != evaluate(expression.right))
+        evaluate(expression.left) != evaluate(expression.right)
       }
     }
   }

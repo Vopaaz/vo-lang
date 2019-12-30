@@ -9,3 +9,7 @@ for learning basic principles of compiler design and practicing the Scala langua
 Based on the book *Writing an interpreter in Go*,
 with some creative modifications rather than just follow step by step.
 
+## TO-DOs
+
+- Clean up dirty error messages
+

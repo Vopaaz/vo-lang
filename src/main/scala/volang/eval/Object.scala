@@ -2,28 +2,44 @@ package volang.eval
 
 abstract class VoObject(val value: Any) {
   val typeName: String = "VoObject"
-  def >=(other: VoObject): Boolean = {
+  def >=(other: VoObject): VoBoolean = {
     throw new UndefinedOperatorException(typeName, ">=")
   }
 
-  def <=(other: VoObject): Boolean = {
+  def <=(other: VoObject): VoBoolean = {
     throw new UndefinedOperatorException(typeName, "<=")
   }
 
-  def >(other: VoObject): Boolean = {
+  def >(other: VoObject): VoBoolean = {
     throw new UndefinedOperatorException(typeName, ">")
   }
 
-  def <(other: VoObject): Boolean = {
+  def <(other: VoObject): VoBoolean = {
     throw new UndefinedOperatorException(typeName, "<")
   }
 
-  def ==(other: VoObject): Boolean = {
+  def ==(other: VoObject): VoBoolean = {
     throw new UndefinedOperatorException(typeName, "==")
   }
 
-  def !=(other: VoObject): Boolean = {
+  def !=(other: VoObject): VoBoolean = {
     !(==(other))
+  }
+
+  def +(other: VoObject): VoObject = {
+    throw new UndefinedOperatorException(typeName, "+")
+  }
+
+  def -(other: VoObject): VoObject = {
+    throw new UndefinedOperatorException(typeName, "-")
+  }
+
+  def *(other: VoObject): VoObject = {
+    throw new UndefinedOperatorException(typeName, "*")
+  }
+
+  def /(other: VoObject): VoObject = {
+    throw new UndefinedOperatorException(typeName, "/")
   }
 }
 
@@ -33,32 +49,37 @@ class VoNumber(override val value: Double) extends VoObject {
     value.toString()
   }
 
-  override def >=(other: VoObject): Boolean = {
+  override def >=(other: VoObject): VoBoolean = {
     assert(other.isInstanceOf[VoNumber])
-    value >= other.asInstanceOf[VoNumber].value
+    new VoBoolean(value >= other.asInstanceOf[VoNumber].value)
   }
 
-  override def <=(other: VoObject): Boolean = {
+  override def <=(other: VoObject): VoBoolean = {
     assert(other.isInstanceOf[VoNumber])
-    value <= other.asInstanceOf[VoNumber].value
+    new VoBoolean(value <= other.asInstanceOf[VoNumber].value)
   }
 
-  override def <(other: VoObject): Boolean = {
+  override def <(other: VoObject): VoBoolean = {
     assert(other.isInstanceOf[VoNumber])
-    value < other.asInstanceOf[VoNumber].value
+    new VoBoolean(value < other.asInstanceOf[VoNumber].value)
   }
 
-  override def >(other: VoObject): Boolean = {
+  override def >(other: VoObject): VoBoolean = {
     assert(other.isInstanceOf[VoNumber])
-    value > other.asInstanceOf[VoNumber].value
+    new VoBoolean(value > other.asInstanceOf[VoNumber].value)
   }
 
-  override def ==(other: VoObject): Boolean = {
-    if (other.isInstanceOf[VoNumber]) {
+  override def ==(other: VoObject): VoBoolean = {
+    new VoBoolean(if (other.isInstanceOf[VoNumber]) {
       value == other.asInstanceOf[VoNumber].value
     } else {
       false
-    }
+    })
+  }
+
+  override def -(other: VoObject): VoNumber = {
+    assert(other.isInstanceOf[VoNumber])
+    new VoNumber(value - other.asInstanceOf[VoNumber].value)
   }
 }
 
@@ -69,7 +90,11 @@ class VoBoolean(override val value: Boolean) extends VoObject {
   }
   override def ==(other: VoObject) = {
     assert(other.isInstanceOf[VoBoolean])
-    value == other.asInstanceOf[VoBoolean].value
+    new VoBoolean(value == other.asInstanceOf[VoBoolean].value)
+  }
+
+  def unary_! = {
+    new VoBoolean(!value)
   }
 }
 
@@ -81,6 +106,6 @@ class VoNone extends VoObject {
   }
 
   override def ==(other: VoObject) = {
-    other.isInstanceOf[VoNone]
+    new VoBoolean(other.isInstanceOf[VoNone])
   }
 }
