@@ -22,19 +22,22 @@ class ReplSpec extends FlatSpec {
   }
 
   "ReadLoop" should "exit when user input quit" in {
-    var in = new StringBufferInputStream(":q")
-    Console.withIn(in) {
-      ReadLoop.startREPL
-    }
+    var in  = new StringBufferInputStream(":q")
+    val out = new ByteArrayOutputStream()
+    Console.withOut(out) {
+      Console.withIn(in) {
+        ReadLoop.startREPL
+      }
 
-    in = new StringBufferInputStream(":exit")
-    Console.withIn(in) {
-      ReadLoop.startRLPL
-    }
+      in = new StringBufferInputStream(":exit")
+      Console.withIn(in) {
+        ReadLoop.startRLPL
+      }
 
-    in = new StringBufferInputStream(":quit")
-    Console.withIn(in) {
-      ReadLoop.startRPPL
+      in = new StringBufferInputStream(":quit")
+      Console.withIn(in) {
+        ReadLoop.startRPPL
+      }
     }
   }
 
@@ -46,19 +49,22 @@ class ReplSpec extends FlatSpec {
     :q
     """
 
-    var in = new StringBufferInputStream(input)
-    Console.withIn(in) {
-      ReadLoop.startREPL
-    }
+    var in  = new StringBufferInputStream(input)
+    val out = new ByteArrayOutputStream()
+    Console.withOut(out) {
+      Console.withIn(in) {
+        ReadLoop.startREPL
+      }
 
-    in = new StringBufferInputStream(input)
-    Console.withIn(in) {
-      ReadLoop.startRLPL
-    }
+      in = new StringBufferInputStream(input)
+      Console.withIn(in) {
+        ReadLoop.startRLPL
+      }
 
-    in = new StringBufferInputStream(input)
-    Console.withIn(in) {
-      ReadLoop.startRPPL
+      in = new StringBufferInputStream(input)
+      Console.withIn(in) {
+        ReadLoop.startRPPL
+      }
     }
   }
 }
