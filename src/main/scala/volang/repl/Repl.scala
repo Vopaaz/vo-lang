@@ -7,10 +7,24 @@ import scala.util.control.Breaks._
 object ReadLoop {
   private val prompt = "> "
   private val exit   = List(":q", ":quit", ":exit")
+  private val message =
+    """
+            _______         _        _______  _        _______
+  |\     /|(  ___  )       ( \      (  ___  )( (    /|(  ____ \
+  | )   ( || (   ) |       | (      | (   ) ||  \  ( || (    \/
+  | |   | || |   | | _____ | |      | (___) ||   \ | || |
+  ( (   ) )| |   | |(_____)| |      |  ___  || (\ \) || | ____
+   \ \_/ / | |   | |       | |      | (   ) || | \   || | \_  )
+    \   /  | (___) |       | (____/\| )   ( || )  \  || (___) |
+     \_/   (_______)       (_______/|/     \||/    )_)(_______)
+
+This is Vo programming language. See more information at https://github.com/Vopaaz/vo-lang.
+Type ":q", ":quit" or ":exit" to quit the interpreter."""
   def startRLPL: Unit = {
 
     /** Read-Lex-Print-Loop
       */
+    println(message)
     breakable {
       while (true) {
         print(prompt)
@@ -32,6 +46,7 @@ object ReadLoop {
 
     /** Read-Parse-Print-Loop
       */
+    println(message)
     breakable {
       while (true) {
         print(prompt)
@@ -51,6 +66,7 @@ object ReadLoop {
 
     /** Read-Evaluation-Print-Loop
       */
+    println(message)
     breakable {
       while (true) {
         print(prompt)
