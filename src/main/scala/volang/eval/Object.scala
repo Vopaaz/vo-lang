@@ -41,6 +41,10 @@ abstract class VoObject(val value: Any) {
   def /(other: VoObject): VoObject = {
     throw new UndefinedOperatorException(typeName, "/")
   }
+
+  def asBoolean: VoBoolean = {
+    throw new UndefinedOperatorException(typeName, "asBoolean")
+  }
 }
 
 class VoNumber(override val value: Double) extends VoObject {
@@ -96,6 +100,14 @@ class VoNumber(override val value: Double) extends VoObject {
     assert(other.isInstanceOf[VoNumber])
     new VoNumber(value / other.asInstanceOf[VoNumber].value)
   }
+
+  override def asBoolean: VoBoolean = {
+    if (value == 0) {
+      new VoBoolean(false)
+    } else {
+      new VoBoolean(true)
+    }
+  }
 }
 
 class VoBoolean(override val value: Boolean) extends VoObject {
@@ -111,6 +123,10 @@ class VoBoolean(override val value: Boolean) extends VoObject {
   def unary_! = {
     new VoBoolean(!value)
   }
+
+  override def asBoolean: VoBoolean = {
+    this
+  }
 }
 
 class VoNone extends VoObject {
@@ -122,5 +138,9 @@ class VoNone extends VoObject {
 
   override def ==(other: VoObject) = {
     new VoBoolean(other.isInstanceOf[VoNone])
+  }
+
+  override def asBoolean: VoBoolean = {
+    new VoBoolean(false)
   }
 }

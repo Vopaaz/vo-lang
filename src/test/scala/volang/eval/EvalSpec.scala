@@ -109,4 +109,31 @@ class EvalSpec extends FlatSpec {
       assert(obj.asInstanceOf[VoNumber].value == x._2)
     })
   }
+
+  it should "evaluate if expressions" in {
+    val inputExpected = List(
+      ("if(true){1}", 1),
+      ("if(1>0){1}", 1),
+      ("if(1>10) {0} else {1}", 1),
+      ("""
+      if(1 < 2){
+        1
+      } else{
+        10
+      }
+      """, 1),
+      ("if(1){1}", 1),
+      ("if(0){0}else{1}",1)
+    )
+
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(obj.isInstanceOf[VoNumber])
+      assert(obj.asInstanceOf[VoNumber].value == x._2)
+    })
+    assert(
+      Evaluator.evaluate(new Parser("if(false){1}").parse).typeName === "None"
+    )
+  }
 }

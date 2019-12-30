@@ -6,12 +6,13 @@ object Evaluator {
   def evaluate(node: Node): VoObject = {
     node match {
       case x: Root             => evalStatements(x.statements)
-      case x: Statement        => evalStatement(x)
       case x: NumberLiteral    => new VoNumber(x.value)
       case x: BooleanLiteral   => new VoBoolean(x.value)
       case x: NoneLiteral      => new VoNone
       case x: PrefixExpression => evalPrefixExpression(x)
       case x: InfixExpression  => evalInfixExpression(x)
+      case x: IfExpression     => evalIfExpression(x)
+      case x: BlockStatement   => evalBlockStatement(x)
     }
   }
 
@@ -23,6 +24,10 @@ object Evaluator {
     statement match {
       case expStmt: ExpressionStatement => evaluate(expStmt.expression)
     }
+  }
+
+  private def evalBlockStatement(statement: BlockStatement): VoObject = {
+    evalStatements(statement.statements)
   }
 
   private def evalPrefixExpression(expression: PrefixExpression): VoObject = {
@@ -77,6 +82,14 @@ object Evaluator {
       case _: DIVIDE => {
         evaluate(expression.left) / evaluate(expression.right)
       }
+    }
+  }
+
+  private def evalIfExpression(expression: IfExpression): VoObject = {
+    if (evaluate(expression.condition).asBoolean.value) {
+      evaluate(expression.thenBlock)
+    } else {
+      evaluate(expression.elseBlock)
     }
   }
 }
