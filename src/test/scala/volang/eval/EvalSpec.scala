@@ -72,4 +72,22 @@ class EvalSpec extends FlatSpec {
       assert(obj.asInstanceOf[VoNumber].value == x._2)
     })
   }
+
+  it should "evaluate comparison expression" in {
+    val inputExpected = List(
+      ("1<=1", true),
+      ("1>2", false),
+      ("true == true", true),
+      ("3 != false", true),
+      ("1>2 == false", true),
+      ("1>2 != 2>3", false)
+    )
+
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(obj.isInstanceOf[VoBoolean])
+      assert(obj.asInstanceOf[VoBoolean].value == x._2)
+    })
+  }
 }

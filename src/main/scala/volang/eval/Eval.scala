@@ -5,12 +5,13 @@ import volang.lexer._
 object Evaluator {
   def evaluate(node: Node): VoObject = {
     node match {
-      case root: Root                => evalStatements(root.statements)
-      case stmt: Statement           => evalStatement(stmt)
-      case number: NumberLiteral     => new VoNumber(number.value)
-      case bool: BooleanLiteral      => new VoBoolean(bool.value)
-      case none: NoneLiteral         => new VoNone
-      case prefExp: PrefixExpression => evalPrefixExpression(prefExp)
+      case x: Root             => evalStatements(x.statements)
+      case x: Statement        => evalStatement(x)
+      case x: NumberLiteral    => new VoNumber(x.value)
+      case x: BooleanLiteral   => new VoBoolean(x.value)
+      case x: NoneLiteral      => new VoNone
+      case x: PrefixExpression => evalPrefixExpression(x)
+      case x: InfixExpression  => evalInfixExpression(x)
     }
   }
 
@@ -50,6 +51,21 @@ object Evaluator {
         new VoBoolean(
           evaluate(expression.left).value == evaluate(expression.right).value
         )
+      case _: GEQ => {
+        new VoBoolean(evaluate(expression.left) >= evaluate(expression.right))
+      }
+      case _: LEQ => {
+        new VoBoolean(evaluate(expression.left) <= evaluate(expression.right))
+      }
+      case _: GT => {
+        new VoBoolean(evaluate(expression.left) > evaluate(expression.right))
+      }
+      case _: LT => {
+        new VoBoolean(evaluate(expression.left) < evaluate(expression.right))
+      }
+      case _: NEQ => {
+        new VoBoolean(evaluate(expression.left) != evaluate(expression.right))
+      }
     }
   }
 }
