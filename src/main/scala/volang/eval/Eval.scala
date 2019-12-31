@@ -14,7 +14,7 @@ object Evaluator {
 
   def evaluateContinuous(node: Root): VoObject = {
     try {
-      _evaluate(node)
+      _evaluate(node, env)
     } catch {
       case x: UndefinedOperatorException => new VoError(x.message)
       case x: AssertionError             => new VoError(x.getMessage())
@@ -23,7 +23,7 @@ object Evaluator {
 
   private def _evaluate(
       node: Node,
-      environment: Environment = env
+      environment: Environment
   ): VoObject = {
     node match {
       case x: Root                => evalStatements(x.statements, environment)
@@ -44,7 +44,7 @@ object Evaluator {
 
   private def evalStatements(
       statements: List[Statement],
-      environment: Environment = env
+      environment: Environment
   ): VoObject = {
     var obj: VoObject = new VoNone
 
@@ -62,16 +62,16 @@ object Evaluator {
 
   private def evalBlockStatement(
       statement: BlockStatement,
-      environment: Environment = env
+      environment: Environment
   ): VoObject = {
     evalStatements(statement.statements, environment)
   }
 
   private def evalLetStatement(
       statement: LetStatement,
-      environment: Environment = env
+      environment: Environment
   ): VoObject = {
-    val value = _evaluate(statement.expression)
+    val value = _evaluate(statement.expression, environment)
     environment.set(statement.identifier.value, value)
     value
   }
@@ -103,56 +103,86 @@ object Evaluator {
 
   private def evalInfixExpression(
       expression: InfixExpression,
-      environment: Environment = env
+      environment: Environment
   ): VoObject = {
     expression.operatorToken match {
       case _: EQ => {
-        _evaluate(expression.left) == _evaluate(expression.right)
+        _evaluate(expression.left, environment) == _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: GEQ => {
-        _evaluate(expression.left) >= _evaluate(expression.right)
+        _evaluate(expression.left, environment) >= _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: LEQ => {
-        _evaluate(expression.left) <= _evaluate(expression.right)
+        _evaluate(expression.left, environment) <= _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: GT => {
-        _evaluate(expression.left) > _evaluate(expression.right)
+        _evaluate(expression.left, environment) > _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: LT => {
-        _evaluate(expression.left) < _evaluate(expression.right)
+        _evaluate(expression.left, environment) < _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: NEQ => {
-        _evaluate(expression.left) != _evaluate(expression.right)
+        _evaluate(expression.left, environment) != _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: PLUS => {
-        _evaluate(expression.left) + _evaluate(expression.right)
+        _evaluate(expression.left, environment) + _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: MINUS => {
-        _evaluate(expression.left) - _evaluate(expression.right)
+        _evaluate(expression.left, environment) - _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: TIMES => {
-        _evaluate(expression.left) * _evaluate(expression.right)
+        _evaluate(expression.left, environment) * _evaluate(
+          expression.right,
+          environment
+        )
       }
       case _: DIVIDE => {
-        _evaluate(expression.left) / _evaluate(expression.right)
+        _evaluate(expression.left, environment) / _evaluate(
+          expression.right,
+          environment
+        )
       }
     }
   }
 
   private def evalIfExpression(
       expression: IfExpression,
-      environment: Environment = env
+      environment: Environment
   ): VoObject = {
-    if (_evaluate(expression.condition).asBoolean.value) {
-      _evaluate(expression.thenBlock)
+    if (_evaluate(expression.condition, environment).asBoolean.value) {
+      _evaluate(expression.thenBlock, environment)
     } else {
-      _evaluate(expression.elseBlock)
+      _evaluate(expression.elseBlock, environment)
     }
   }
 
   private def evalIdentifier(
       identifier: Identifier,
-      environment: Environment = env
+      environment: Environment
   ): VoObject = {
     environment.get(identifier.value)
   }
@@ -163,17 +193,17 @@ object Evaluator {
 
   private def evalCallExpression(
       expression: CallExpression,
-      environment: Environment = env
+      environment: Environment
   ): VoObject = {
     val funcRaw = _evaluate(expression.function, environment)
     assert(funcRaw.isInstanceOf[VoFunction])
     val func    = funcRaw.asInstanceOf[VoFunction]
     val funcEnv = new Environment
     func.parameters
-      .zip(expression.arguments)
+      .zip(expression.arguments.map(x => _evaluate(x, environment)))
       .foreach(
         x => {
-          funcEnv.set(x._1.value, _evaluate(x._2, environment))
+          funcEnv.set(x._1.value, x._2)
         }
       )
     _evaluate(func.block, funcEnv)

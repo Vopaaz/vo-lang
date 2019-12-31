@@ -203,7 +203,7 @@ class EvalSpec extends FlatSpec {
     assert(f.block.statements.length == 2)
   }
 
-  it should "evaluate function binding and function call" in {
+  it should "evaluate parameter binding and function call" in {
     val inputExpected = List(
       ("""
       let f = func(x){x}
@@ -211,6 +211,45 @@ class EvalSpec extends FlatSpec {
       """, 1),
       ("""
       func(x){x}(1)
+      """, 1)
+    )
+
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(obj.isInstanceOf[VoNumber])
+      assert(obj.asInstanceOf[VoNumber].value == x._2)
+    })
+  }
+
+  it should "evaluate complex function call" in {
+    val inputExpected = List(
+      ("""
+      let f = func(x){
+        x + 1
+      }
+      f(1)
+      """, 2),
+      ("""
+      let f = func(x, y){
+        if(x < y){
+          1
+        } else {
+          2
+        }
+      }
+      f(1,2)
+      """, 1),
+      ("""
+      let f = func(x, y){
+        let z = x
+        if (z > y){
+          1
+        } else {
+          2
+        }
+      }
+      f(3,2)
       """, 1)
     )
 

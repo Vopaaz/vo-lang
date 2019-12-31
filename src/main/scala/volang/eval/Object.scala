@@ -152,14 +152,13 @@ class VoFunction(
 ) extends VoObject {
 
   override val typeName: String = "Function"
-  val env: Environment          = new Environment
 
   override def toString(): String = {
     "func(" +
       parameters
         .map(x => x.value)
         .mkString(", ") +
-      ")" + block.toString() + "outerEnv:\n" + env.toString()
+      ")" + block.toString()
   }
 }
 
