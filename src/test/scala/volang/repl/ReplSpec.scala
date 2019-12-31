@@ -67,4 +67,25 @@ class ReplSpec extends FlatSpec {
       }
     }
   }
+
+  it should "evaluate continuously (without clearing the environment)" in {
+    val input = """
+    let x = 5
+    x
+    :q
+    """
+
+    val in  = new StringBufferInputStream(input)
+    val out = new ByteArrayOutputStream()
+    Console.withOut(out) {
+      Console.withIn(in) {
+        ReadLoop.startREPL
+      }
+      val outStr = out.toString()
+      assert(outStr.contains("5.0"))
+      assert(
+        outStr.slice(outStr.indexOf("5.0") + 2, outStr.length()).contains("5.0")
+      )
+    }
+  }
 }

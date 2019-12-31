@@ -77,7 +77,7 @@ Type ":q", ":quit" or ":exit" to quit the interpreter."""
           break
         }
         val root = new Parser(s).parse
-        println(Evaluator.evaluate(root))
+        println(Evaluator.evaluateContinuous(root))
       }
     }
   }

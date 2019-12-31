@@ -9,6 +9,10 @@ object Evaluator {
 
   def evaluate(node: Root): VoObject = {
     env.clear
+    evaluateContinuous(node)
+  }
+
+  def evaluateContinuous(node: Root): VoObject = {
     try {
       _evaluate(node)
     } catch {
