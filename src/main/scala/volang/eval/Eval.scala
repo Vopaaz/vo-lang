@@ -5,7 +5,10 @@ import volang.lexer._
 import scala.util.control.Breaks._
 
 object Evaluator {
-  def evaluate(node: Node): VoObject = {
+  val env = new Environment
+
+  def evaluate(node: Root): VoObject = {
+    env.clear
     try {
       _evaluate(node)
     } catch {
@@ -14,16 +17,19 @@ object Evaluator {
     }
   }
 
-  def _evaluate(node: Node): VoObject = {
+  private def _evaluate(node: Node): VoObject = {
     node match {
-      case x: Root             => evalStatements(x.statements)
-      case x: NumberLiteral    => new VoNumber(x.value)
-      case x: BooleanLiteral   => new VoBoolean(x.value)
-      case x: NoneLiteral      => new VoNone
-      case x: PrefixExpression => evalPrefixExpression(x)
-      case x: InfixExpression  => evalInfixExpression(x)
-      case x: IfExpression     => evalIfExpression(x)
-      case x: BlockStatement   => evalBlockStatement(x)
+      case x: Root                => evalStatements(x.statements)
+      case x: NumberLiteral       => new VoNumber(x.value)
+      case x: BooleanLiteral      => new VoBoolean(x.value)
+      case x: NoneLiteral         => new VoNone
+      case x: PrefixExpression    => evalPrefixExpression(x)
+      case x: InfixExpression     => evalInfixExpression(x)
+      case x: IfExpression        => evalIfExpression(x)
+      case x: BlockStatement      => evalBlockStatement(x)
+      case x: Identifier          => evalIdentifier(x)
+      case x: ExpressionStatement => _evaluate(x.expression)
+      case x: LetStatement        => evalLetStatement(x)
     }
   }
 
@@ -32,7 +38,7 @@ object Evaluator {
 
     breakable {
       for (statement <- statements) {
-        obj = evalStatement(statement)
+        obj = _evaluate(statement)
         if (obj.isInstanceOf[VoError]) {
           break
         }
@@ -42,20 +48,20 @@ object Evaluator {
     obj
   }
 
-  private def evalStatement(statement: Statement): VoObject = {
-    statement match {
-      case expStmt: ExpressionStatement => evaluate(expStmt.expression)
-    }
-  }
-
   private def evalBlockStatement(statement: BlockStatement): VoObject = {
     evalStatements(statement.statements)
   }
 
+  private def evalLetStatement(statement: LetStatement): VoObject = {
+    val value = _evaluate(statement.expression)
+    env.set(statement.identifier.value, value)
+    value
+  }
+
   private def evalPrefixExpression(expression: PrefixExpression): VoObject = {
     expression.operatorToken match {
-      case _: NOT   => evalNotPrefixExpression(evaluate(expression.right))
-      case _: MINUS => evalMinusPrefixExpression(evaluate(expression.right))
+      case _: NOT   => evalNotPrefixExpression(_evaluate(expression.right))
+      case _: MINUS => evalMinusPrefixExpression(_evaluate(expression.right))
     }
   }
 
@@ -75,43 +81,47 @@ object Evaluator {
   private def evalInfixExpression(expression: InfixExpression): VoObject = {
     expression.operatorToken match {
       case _: EQ => {
-        evaluate(expression.left) == evaluate(expression.right)
+        _evaluate(expression.left) == _evaluate(expression.right)
       }
       case _: GEQ => {
-        evaluate(expression.left) >= evaluate(expression.right)
+        _evaluate(expression.left) >= _evaluate(expression.right)
       }
       case _: LEQ => {
-        evaluate(expression.left) <= evaluate(expression.right)
+        _evaluate(expression.left) <= _evaluate(expression.right)
       }
       case _: GT => {
-        evaluate(expression.left) > evaluate(expression.right)
+        _evaluate(expression.left) > _evaluate(expression.right)
       }
       case _: LT => {
-        evaluate(expression.left) < evaluate(expression.right)
+        _evaluate(expression.left) < _evaluate(expression.right)
       }
       case _: NEQ => {
-        evaluate(expression.left) != evaluate(expression.right)
+        _evaluate(expression.left) != _evaluate(expression.right)
       }
       case _: PLUS => {
-        evaluate(expression.left) + evaluate(expression.right)
+        _evaluate(expression.left) + _evaluate(expression.right)
       }
       case _: MINUS => {
-        evaluate(expression.left) - evaluate(expression.right)
+        _evaluate(expression.left) - _evaluate(expression.right)
       }
       case _: TIMES => {
-        evaluate(expression.left) * evaluate(expression.right)
+        _evaluate(expression.left) * _evaluate(expression.right)
       }
       case _: DIVIDE => {
-        evaluate(expression.left) / evaluate(expression.right)
+        _evaluate(expression.left) / _evaluate(expression.right)
       }
     }
   }
 
   private def evalIfExpression(expression: IfExpression): VoObject = {
-    if (evaluate(expression.condition).asBoolean.value) {
-      evaluate(expression.thenBlock)
+    if (_evaluate(expression.condition).asBoolean.value) {
+      _evaluate(expression.thenBlock)
     } else {
-      evaluate(expression.elseBlock)
+      _evaluate(expression.elseBlock)
     }
+  }
+
+  private def evalIdentifier(identifier: Identifier): VoObject = {
+    env.get(identifier.value)
   }
 }

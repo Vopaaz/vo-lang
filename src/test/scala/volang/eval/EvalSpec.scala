@@ -158,4 +158,36 @@ class EvalSpec extends FlatSpec {
       assert(Evaluator.evaluate(new Parser(x).parse).isInstanceOf[VoError])
     })
   }
+
+  it should "evaluate identifiers whose value is assigned" in {
+    val inputExpected = List(
+      ("""
+    let a = 5
+    a""", 5),
+      ("""
+    let a = 5+5
+    a
+    """, 10),
+      ("""
+    let a = 5
+    let b = a
+    b""", 5),
+      ("""
+    let a = 5
+    let b = a+1
+    let c = a+b
+    """, 11)
+    )
+
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(obj.isInstanceOf[VoNumber])
+      assert(obj.asInstanceOf[VoNumber].value == x._2)
+    })
+  }
+
+  it should "return VoError if a value hasn't been bounded to an identifier" in {
+    assert(Evaluator.evaluate(new Parser("foo").parse).isInstanceOf[VoError])
+  }
 }
