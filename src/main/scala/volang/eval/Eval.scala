@@ -21,28 +21,36 @@ object Evaluator {
     }
   }
 
-  private def _evaluate(node: Node): VoObject = {
+  private def _evaluate(
+      node: Node,
+      environment: Environment = env
+  ): VoObject = {
     node match {
-      case x: Root                => evalStatements(x.statements)
+      case x: Root                => evalStatements(x.statements, environment)
       case x: NumberLiteral       => new VoNumber(x.value)
       case x: BooleanLiteral      => new VoBoolean(x.value)
       case x: NoneLiteral         => new VoNone
-      case x: PrefixExpression    => evalPrefixExpression(x)
-      case x: InfixExpression     => evalInfixExpression(x)
-      case x: IfExpression        => evalIfExpression(x)
-      case x: BlockStatement      => evalBlockStatement(x)
-      case x: Identifier          => evalIdentifier(x)
-      case x: ExpressionStatement => _evaluate(x.expression)
-      case x: LetStatement        => evalLetStatement(x)
+      case x: PrefixExpression    => evalPrefixExpression(x, environment)
+      case x: InfixExpression     => evalInfixExpression(x, environment)
+      case x: IfExpression        => evalIfExpression(x, environment)
+      case x: BlockStatement      => evalBlockStatement(x, environment)
+      case x: Identifier          => evalIdentifier(x, environment)
+      case x: ExpressionStatement => _evaluate(x.expression, environment)
+      case x: LetStatement        => evalLetStatement(x, environment)
+      case x: FunctionLiteral     => evalFunctionLiteral(x)
+      case x: CallExpression      => evalCallExpression(x, environment)
     }
   }
 
-  private def evalStatements(statements: List[Statement]): VoObject = {
+  private def evalStatements(
+      statements: List[Statement],
+      environment: Environment = env
+  ): VoObject = {
     var obj: VoObject = new VoNone
 
     breakable {
       for (statement <- statements) {
-        obj = _evaluate(statement)
+        obj = _evaluate(statement, environment)
         if (obj.isInstanceOf[VoError]) {
           break
         }
@@ -52,20 +60,31 @@ object Evaluator {
     obj
   }
 
-  private def evalBlockStatement(statement: BlockStatement): VoObject = {
-    evalStatements(statement.statements)
+  private def evalBlockStatement(
+      statement: BlockStatement,
+      environment: Environment = env
+  ): VoObject = {
+    evalStatements(statement.statements, environment)
   }
 
-  private def evalLetStatement(statement: LetStatement): VoObject = {
+  private def evalLetStatement(
+      statement: LetStatement,
+      environment: Environment = env
+  ): VoObject = {
     val value = _evaluate(statement.expression)
-    env.set(statement.identifier.value, value)
+    environment.set(statement.identifier.value, value)
     value
   }
 
-  private def evalPrefixExpression(expression: PrefixExpression): VoObject = {
+  private def evalPrefixExpression(
+      expression: PrefixExpression,
+      environment: Environment
+  ): VoObject = {
     expression.operatorToken match {
-      case _: NOT   => evalNotPrefixExpression(_evaluate(expression.right))
-      case _: MINUS => evalMinusPrefixExpression(_evaluate(expression.right))
+      case _: NOT =>
+        evalNotPrefixExpression(_evaluate(expression.right, environment))
+      case _: MINUS =>
+        evalMinusPrefixExpression(_evaluate(expression.right, environment))
     }
   }
 
@@ -82,7 +101,10 @@ object Evaluator {
     }
   }
 
-  private def evalInfixExpression(expression: InfixExpression): VoObject = {
+  private def evalInfixExpression(
+      expression: InfixExpression,
+      environment: Environment = env
+  ): VoObject = {
     expression.operatorToken match {
       case _: EQ => {
         _evaluate(expression.left) == _evaluate(expression.right)
@@ -117,7 +139,10 @@ object Evaluator {
     }
   }
 
-  private def evalIfExpression(expression: IfExpression): VoObject = {
+  private def evalIfExpression(
+      expression: IfExpression,
+      environment: Environment = env
+  ): VoObject = {
     if (_evaluate(expression.condition).asBoolean.value) {
       _evaluate(expression.thenBlock)
     } else {
@@ -125,7 +150,32 @@ object Evaluator {
     }
   }
 
-  private def evalIdentifier(identifier: Identifier): VoObject = {
-    env.get(identifier.value)
+  private def evalIdentifier(
+      identifier: Identifier,
+      environment: Environment = env
+  ): VoObject = {
+    environment.get(identifier.value)
+  }
+
+  private def evalFunctionLiteral(function: FunctionLiteral): VoFunction = {
+    new VoFunction(function.parameters, function.block)
+  }
+
+  private def evalCallExpression(
+      expression: CallExpression,
+      environment: Environment = env
+  ): VoObject = {
+    val funcRaw = _evaluate(expression.function, environment)
+    assert(funcRaw.isInstanceOf[VoFunction])
+    val func    = funcRaw.asInstanceOf[VoFunction]
+    val funcEnv = new Environment
+    func.parameters
+      .zip(expression.arguments)
+      .foreach(
+        x => {
+          funcEnv.set(x._1.value, _evaluate(x._2, environment))
+        }
+      )
+    _evaluate(func.block, funcEnv)
   }
 }

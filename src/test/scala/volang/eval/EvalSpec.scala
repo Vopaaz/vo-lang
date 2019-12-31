@@ -190,4 +190,35 @@ class EvalSpec extends FlatSpec {
   it should "return VoError if a value hasn't been bounded to an identifier" in {
     assert(Evaluator.evaluate(new Parser("foo").parse).isInstanceOf[VoError])
   }
+
+  it should "evaluate function literal" in {
+    val input  = """func(x,y){
+      x
+      y
+    }"""
+    val result = Evaluator.evaluate(new Parser(input).parse)
+    assert(result.isInstanceOf[VoFunction])
+    val f = result.asInstanceOf[VoFunction]
+    assert(f.parameters.length == 2)
+    assert(f.block.statements.length == 2)
+  }
+
+  it should "evaluate function binding and function call" in {
+    val inputExpected = List(
+      ("""
+      let f = func(x){x}
+      f(1)
+      """, 1),
+      ("""
+      func(x){x}(1)
+      """, 1)
+    )
+
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(obj.isInstanceOf[VoNumber])
+      assert(obj.asInstanceOf[VoNumber].value == x._2)
+    })
+  }
 }

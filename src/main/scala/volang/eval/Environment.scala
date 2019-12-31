@@ -17,4 +17,8 @@ class Environment {
   def clear = {
     store.clear()
   }
+
+  override def toString(): String = {
+    store.mkString("\n")
+  }
 }

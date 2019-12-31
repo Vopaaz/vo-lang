@@ -1,4 +1,5 @@
 package volang.eval
+import volang.ast._
 
 abstract class VoObject(val value: Any) {
   val typeName: String = "VoObject"
@@ -142,6 +143,23 @@ class VoNone extends VoObject {
 
   override def asBoolean: VoBoolean = {
     new VoBoolean(false)
+  }
+}
+
+class VoFunction(
+    val parameters: List[Identifier],
+    val block: BlockStatement
+) extends VoObject {
+
+  override val typeName: String = "Function"
+  val env: Environment          = new Environment
+
+  override def toString(): String = {
+    "func(" +
+      parameters
+        .map(x => x.value)
+        .mkString(", ") +
+      ")" + block.toString() + "outerEnv:\n" + env.toString()
   }
 }
 
