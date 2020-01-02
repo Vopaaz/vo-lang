@@ -37,7 +37,7 @@ object Evaluator {
       case x: Identifier          => evalIdentifier(x, environment)
       case x: ExpressionStatement => _evaluate(x.expression, environment)
       case x: LetStatement        => evalLetStatement(x, environment)
-      case x: FunctionLiteral     => evalFunctionLiteral(x)
+      case x: FunctionLiteral     => evalFunctionLiteral(x, environment)
       case x: CallExpression      => evalCallExpression(x, environment)
     }
   }
@@ -187,8 +187,11 @@ object Evaluator {
     environment.get(identifier.value)
   }
 
-  private def evalFunctionLiteral(function: FunctionLiteral): VoFunction = {
-    new VoFunction(function.parameters, function.block)
+  private def evalFunctionLiteral(
+      function: FunctionLiteral,
+      environment: Environment
+  ): VoFunction = {
+    new VoFunction(function.parameters, function.block, environment)
   }
 
   private def evalCallExpression(
@@ -198,7 +201,7 @@ object Evaluator {
     val funcRaw = _evaluate(expression.function, environment)
     assert(funcRaw.isInstanceOf[VoFunction])
     val func    = funcRaw.asInstanceOf[VoFunction]
-    val funcEnv = new Environment
+    val funcEnv = func.environment
     func.parameters
       .zip(expression.arguments.map(x => _evaluate(x, environment)))
       .foreach(

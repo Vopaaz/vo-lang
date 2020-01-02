@@ -148,7 +148,8 @@ class VoNone extends VoObject {
 
 class VoFunction(
     val parameters: List[Identifier],
-    val block: BlockStatement
+    val block: BlockStatement,
+    val environment: Environment
 ) extends VoObject {
 
   override val typeName: String = "Function"

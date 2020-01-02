@@ -231,4 +231,19 @@ class EvalSpec extends FlatSpec {
 
     checkInputExpected[VoNumber](inputExpected)
   }
+
+  it should "evaluate higher order functions" in {
+    val inputExpected = List(
+      ("""
+      let adder = func(x) {
+        func(y) { x + y }
+      }
+
+      let add2 = adder(2)
+      add2(2)
+      """, 4)
+    )
+
+    checkInputExpected[VoNumber](inputExpected)
+  }
 }
