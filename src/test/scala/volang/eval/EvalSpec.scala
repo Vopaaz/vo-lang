@@ -272,4 +272,39 @@ class EvalSpec extends FlatSpec {
     checkInputExpected[VoNumber](inputExpected)
   }
 
+  it should "evaluate fibonacci" in {
+    val defFib = """
+
+    let fibonacci = func(n){
+      if (n > 2) {
+        fibonacci(n-1) + fibonacci(n-2)
+      } else {
+        1
+      }
+    }
+
+    """
+
+    def fibInput(n: Int): String = {
+      s"""
+      $defFib
+      fibonacci(${n.toString()})
+      """
+    }
+
+    val inputExpected = List(
+      (fibInput(1), 1),
+      (fibInput(2), 1),
+      (fibInput(3), 2),
+      (fibInput(4), 3),
+      (fibInput(5), 5),
+      (fibInput(6), 8),
+      (fibInput(7), 13),
+      (fibInput(8), 21),
+      (fibInput(9), 34),
+      (fibInput(10), 55)
+    )
+
+    checkInputExpected[VoNumber](inputExpected)
+  }
 }
