@@ -1,4 +1,4 @@
-package volang.repl
+package volang.exec
 
 import org.scalatest.FlatSpec
 import scala.io._

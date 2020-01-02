@@ -1,4 +1,4 @@
-package volang.repl
+package volang.exec
 import volang.lexer._
 import volang.ast.Parser
 import volang.eval.Evaluator
