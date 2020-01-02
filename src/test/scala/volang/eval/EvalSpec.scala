@@ -241,9 +241,18 @@ class EvalSpec extends FlatSpec {
 
       let add2 = adder(2)
       add2(2)
-      """, 4)
+      """, 4),
+      ("""
+      let apply_on_1 = func(f){
+        f(1)
+      }
+
+      let add1 = func(x) { x + 1 }
+      apply_on_1(add1)
+      """, 2)
     )
 
     checkInputExpected[VoNumber](inputExpected)
   }
+
 }
