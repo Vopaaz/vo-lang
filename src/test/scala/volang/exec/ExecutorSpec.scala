@@ -2,6 +2,7 @@ package volang.exec
 
 import org.scalatest.FlatSpec
 import java.io.ByteArrayOutputStream
+import scala.io.Source
 
 class ExecutorSpec extends FlatSpec {
   "Executor" should "work" in {
@@ -18,5 +19,24 @@ class ExecutorSpec extends FlatSpec {
       Executor.exec(input)
       assert(out.toString().contains("4.0"))
     }
+  }
+
+  it should "run every demo" in {
+    val csv =
+      Source.fromResource("demo/index.csv").getLines()
+    csv.next() // Skip the header
+
+    csv.foreach(line => {
+      val split        = line.split(",")
+      val filename     = split(0).trim()
+      val result       = split(1).trim()
+      val fullFilename = s"demo/$filename.vo"
+      val content      = Source.fromResource(fullFilename).mkString
+      val out          = new ByteArrayOutputStream
+      Console.withOut(out) {
+        Executor.exec(content)
+        assert(out.toString().trim() == result)
+      }
+    })
   }
 }
