@@ -6,4 +6,4 @@ let fibonacci = func(n) {
     }
 }
 
-fibonacci(5)
+fibonacci(10)
