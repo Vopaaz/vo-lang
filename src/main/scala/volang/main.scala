@@ -2,7 +2,7 @@ package volang
 import volang.ast.Parser
 import volang.lexer._
 import volang.ast._
-import volang.repl.ReadLoop
+import volang.exec.ReadLoop
 
 object Main {
   def main(args: Array[String]) = {
