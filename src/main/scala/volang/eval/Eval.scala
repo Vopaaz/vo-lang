@@ -209,6 +209,6 @@ object Evaluator {
           funcEnv.set(x._1.value, x._2)
         }
       )
-    _evaluate(func.block, funcEnv)
+    _evaluate(func.block, funcEnv.clone())
   }
 }

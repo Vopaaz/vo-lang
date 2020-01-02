@@ -21,4 +21,12 @@ class Environment {
   override def toString(): String = {
     store.mkString("\n")
   }
+
+  override def clone(): Environment = {
+    val newEnv = new Environment
+    store.foreach(x => {
+      newEnv.set(x._1, x._2)
+    })
+    newEnv
+  }
 }
