@@ -250,7 +250,16 @@ class EvalSpec extends FlatSpec {
         }
       }
       f(3,2)
-      """, 1)
+      """, 1),
+      ("""
+      func(x){
+        2*x
+      }(2)
+      """, 4),
+      ("""
+      let add = func(x, y){ x + y }
+      add(1, add(1, 1))
+      """, 3)
     )
 
     inputExpected.foreach(x => {
