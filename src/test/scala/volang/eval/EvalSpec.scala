@@ -2,35 +2,33 @@ package volang.eval
 
 import org.scalatest.FlatSpec
 import volang.ast.Parser
+import scala.reflect._
 
 class EvalSpec extends FlatSpec {
+
+  def checkInputExpected[T1 <: VoObject: ClassTag](
+      inputExpected: List[Tuple2[String, Any]]
+  ) = {
+    inputExpected.foreach(x => {
+      val root = new Parser(x._1).parse
+      val obj  = Evaluator.evaluate(root)
+      assert(classTag[T1].runtimeClass.isInstance(obj))
+      assert(obj.asInstanceOf[T1].value == x._2)
+    })
+  }
+
   "Evaluator" should "evaluate number expression" in {
-    val inputs = List(
-      "5",
-      "10.5"
+    val inputExpected = List(
+      ("5", 5),
+      ("10.5", 10.5)
     )
-    val expected = List(5, 10.5)
-    inputs
-      .zip(expected)
-      .foreach(x => {
-        val root = new Parser(x._1).parse
-        val obj  = Evaluator.evaluate(root)
-        assert(obj.isInstanceOf[VoNumber])
-        assert(obj.asInstanceOf[VoNumber].value == x._2)
-      })
+    checkInputExpected[VoNumber](inputExpected)
   }
 
   it should "evaluate boolean expression" in {
     val inputs   = List("true", "false")
     val expected = List(true, false)
-    inputs
-      .zip(expected)
-      .foreach(x => {
-        val root = new Parser(x._1).parse
-        val obj  = Evaluator.evaluate(root)
-        assert(obj.isInstanceOf[VoBoolean])
-        assert(obj.asInstanceOf[VoBoolean].value == x._2)
-      })
+    checkInputExpected[VoBoolean](inputs.zip(expected))
   }
 
   it should "evaluate none expression" in {
@@ -50,12 +48,7 @@ class EvalSpec extends FlatSpec {
       ("!!0", false)
     )
 
-    inputExpected.foreach(x => {
-      val root = new Parser(x._1).parse
-      val obj  = Evaluator.evaluate(root)
-      assert(obj.isInstanceOf[VoBoolean])
-      assert(obj.asInstanceOf[VoBoolean].value == x._2)
-    })
+    checkInputExpected[VoBoolean](inputExpected)
   }
 
   it should "evaluate prefix expression for '-'" in {
@@ -65,12 +58,7 @@ class EvalSpec extends FlatSpec {
       ("-0", 0)
     )
 
-    inputExpected.foreach(x => {
-      val root = new Parser(x._1).parse
-      val obj  = Evaluator.evaluate(root)
-      assert(obj.isInstanceOf[VoNumber])
-      assert(obj.asInstanceOf[VoNumber].value == x._2)
-    })
+    checkInputExpected[VoNumber](inputExpected)
   }
 
   it should "evaluate comparison expression" in {
@@ -83,12 +71,7 @@ class EvalSpec extends FlatSpec {
       ("1>2 != 2>3", false)
     )
 
-    inputExpected.foreach(x => {
-      val root = new Parser(x._1).parse
-      val obj  = Evaluator.evaluate(root)
-      assert(obj.isInstanceOf[VoBoolean])
-      assert(obj.asInstanceOf[VoBoolean].value == x._2)
-    })
+    checkInputExpected[VoBoolean](inputExpected)
   }
 
   it should "evaluate number arithmetic expression" in {
@@ -102,12 +85,7 @@ class EvalSpec extends FlatSpec {
       ("(1+-1)/10", 0.0)
     )
 
-    inputExpected.foreach(x => {
-      val root = new Parser(x._1).parse
-      val obj  = Evaluator.evaluate(root)
-      assert(obj.isInstanceOf[VoNumber])
-      assert(obj.asInstanceOf[VoNumber].value == x._2)
-    })
+    checkInputExpected[VoNumber](inputExpected)
   }
 
   it should "evaluate if expressions" in {
@@ -126,12 +104,7 @@ class EvalSpec extends FlatSpec {
       ("if(0){0}else{1}", 1)
     )
 
-    inputExpected.foreach(x => {
-      val root = new Parser(x._1).parse
-      val obj  = Evaluator.evaluate(root)
-      assert(obj.isInstanceOf[VoNumber])
-      assert(obj.asInstanceOf[VoNumber].value == x._2)
-    })
+    checkInputExpected[VoNumber](inputExpected)
     assert(
       Evaluator.evaluate(new Parser("if(false){1}").parse).isInstanceOf[VoNone]
     )
@@ -179,12 +152,7 @@ class EvalSpec extends FlatSpec {
     """, 11)
     )
 
-    inputExpected.foreach(x => {
-      val root = new Parser(x._1).parse
-      val obj  = Evaluator.evaluate(root)
-      assert(obj.isInstanceOf[VoNumber])
-      assert(obj.asInstanceOf[VoNumber].value == x._2)
-    })
+    checkInputExpected[VoNumber](inputExpected)
   }
 
   it should "return VoError if a value hasn't been bounded to an identifier" in {
@@ -214,12 +182,7 @@ class EvalSpec extends FlatSpec {
       """, 1)
     )
 
-    inputExpected.foreach(x => {
-      val root = new Parser(x._1).parse
-      val obj  = Evaluator.evaluate(root)
-      assert(obj.isInstanceOf[VoNumber])
-      assert(obj.asInstanceOf[VoNumber].value == x._2)
-    })
+    checkInputExpected[VoNumber](inputExpected)
   }
 
   it should "evaluate complex function call" in {
@@ -262,11 +225,6 @@ class EvalSpec extends FlatSpec {
       """, 3)
     )
 
-    inputExpected.foreach(x => {
-      val root = new Parser(x._1).parse
-      val obj  = Evaluator.evaluate(root)
-      assert(obj.isInstanceOf[VoNumber])
-      assert(obj.asInstanceOf[VoNumber].value == x._2)
-    })
+    checkInputExpected[VoNumber](inputExpected)
   }
 }

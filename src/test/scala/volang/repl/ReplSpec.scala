@@ -71,7 +71,9 @@ class ReplSpec extends FlatSpec {
   it should "evaluate continuously (without clearing the environment)" in {
     val input = """
     let x = 5
+
     x
+    
     :q
     """
 
