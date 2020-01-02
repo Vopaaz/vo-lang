@@ -222,7 +222,11 @@ class EvalSpec extends FlatSpec {
       ("""
       let add = func(x, y){ x + y }
       add(1, add(1, 1))
-      """, 3)
+      """, 3),
+      ("""
+      let add = func(x, y){ x + y }
+      add(add(1*2, 1+2), add(1/2, 1-2))
+      """, 4.5)
     )
 
     checkInputExpected[VoNumber](inputExpected)
