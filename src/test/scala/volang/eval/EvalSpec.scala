@@ -255,4 +255,21 @@ class EvalSpec extends FlatSpec {
     checkInputExpected[VoNumber](inputExpected)
   }
 
+  it should "evaluate function that recursively calls itself" in {
+    val inputExpected = List(
+      ("""
+      let ceiling1 = func(x) {
+        if (x > 1) {
+          ceiling1(x - 1)
+        } else {
+          x
+        }
+      }
+      ceiling1(10)
+      """, 1)
+    )
+
+    checkInputExpected[VoNumber](inputExpected)
+  }
+
 }
