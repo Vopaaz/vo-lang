@@ -147,3 +147,10 @@ class CallExpression(val function: Expression, val arguments: List[Expression])
       .toString() + "(" + arguments.map(x => x.toString()).mkString(", ") + ")"
   }
 }
+
+class StringLiteral(val token: STRING) extends Expression {
+  val value = token.literal
+  override def toString(): String = {
+    value
+  }
+}

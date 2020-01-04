@@ -89,6 +89,7 @@ class Parser(input: String) {
         case _: TRUE       => Some(parseBooleanLiteral)
         case _: FALSE      => Some(parseBooleanLiteral)
         case _: NONE       => Some(parseNoneLiteral)
+        case _: STRING     => Some(parseStringLiteral)
       }
     }
 
@@ -125,6 +126,10 @@ class Parser(input: String) {
 
   private def parseNoneLiteral: NoneLiteral = {
     new NoneLiteral(nextToken.asInstanceOf[NONE])
+  }
+
+  private def parseStringLiteral: StringLiteral = {
+    new StringLiteral(nextToken.asInstanceOf[STRING])
   }
 
   private def parsePrefixExpression: PrefixExpression = {

@@ -170,3 +170,24 @@ class VoError(val message: String) extends VoObject {
     message
   }
 }
+
+class VoString(override val value: String) extends VoObject {
+  override val typeName: String = "String"
+  override def toString(): String = {
+    value
+  }
+
+  override def ==(other: VoObject): VoBoolean = {
+    assert(other.isInstanceOf[VoString])
+    new VoBoolean(value == other.asInstanceOf[VoString].value)
+  }
+
+  override def asBoolean: VoBoolean = {
+    new VoBoolean(value.nonEmpty)
+  }
+
+  override def +(other: VoObject): VoString = {
+    assert(other.isInstanceOf[VoString])
+    new VoString(value + other.asInstanceOf[VoString].value)
+  }
+}

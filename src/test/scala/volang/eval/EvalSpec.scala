@@ -307,4 +307,23 @@ class EvalSpec extends FlatSpec {
 
     checkInputExpected[VoNumber](inputExpected)
   }
+
+  it should "evaluate string and its operations" in {
+    val inputExpected = List(
+      ("""
+      "Hello world"
+      """, "Hello world"),
+      ("""
+      'hw'
+      """, "hw"),
+      ("""
+      'a' + "b"
+      """, "ab"),
+      ("""
+      func(x, y){ x + y }("a", "b")
+      """, "ab")
+    )
+
+    checkInputExpected[VoString](inputExpected)
+  }
 }

@@ -30,6 +30,7 @@ object Evaluator {
       case x: NumberLiteral       => new VoNumber(x.value)
       case x: BooleanLiteral      => new VoBoolean(x.value)
       case x: NoneLiteral         => new VoNone
+      case x: StringLiteral       => new VoString(x.value)
       case x: PrefixExpression    => evalPrefixExpression(x, environment)
       case x: InfixExpression     => evalInfixExpression(x, environment)
       case x: IfExpression        => evalIfExpression(x, environment)
