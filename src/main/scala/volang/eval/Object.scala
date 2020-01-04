@@ -1,6 +1,8 @@
 package volang.eval
 import volang.ast._
 
+trait DisplayInREPL
+
 abstract class VoObject(val value: Any) {
   val typeName: String = "VoObject"
   def >=(other: VoObject): VoBoolean = {
@@ -48,7 +50,7 @@ abstract class VoObject(val value: Any) {
   }
 }
 
-class VoNumber(override val value: Double) extends VoObject {
+class VoNumber(override val value: Double) extends VoObject with DisplayInREPL{
   override val typeName = "Number"
   override def toString(): String = {
     value.toString()
@@ -111,7 +113,7 @@ class VoNumber(override val value: Double) extends VoObject {
   }
 }
 
-class VoBoolean(override val value: Boolean) extends VoObject {
+class VoBoolean(override val value: Boolean) extends VoObject with DisplayInREPL{
   override val typeName = "Boolean"
   override def toString(): String = {
     value.toString()
@@ -171,7 +173,7 @@ class VoError(val message: String) extends VoObject {
   }
 }
 
-class VoString(override val value: String) extends VoObject {
+class VoString(override val value: String) extends VoObject with DisplayInREPL{
   override val typeName: String = "String"
   override def toString(): String = {
     value

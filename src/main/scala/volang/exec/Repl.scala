@@ -3,6 +3,7 @@ import volang.lexer._
 import volang.ast.Parser
 import volang.eval.Evaluator
 import scala.util.control.Breaks._
+import volang.eval._
 
 object ReadLoop {
   private val prompt = "> "
@@ -20,6 +21,7 @@ object ReadLoop {
 
 This is Vo programming language. See more information at https://github.com/Vopaaz/vo-lang.
 Type ":q", ":quit" or ":exit" to quit the interpreter."""
+  val _message = message
   def startRLPL: Unit = {
 
     /** Read-Lex-Print-Loop
@@ -69,16 +71,24 @@ Type ":q", ":quit" or ":exit" to quit the interpreter."""
     println(message)
     breakable {
       while (true) {
-        print(prompt)
-        Console.flush()
-
-        val s = io.StdIn.readLine()
-        if (exit.contains(s.trim())) {
-          break
-        }
-        val root = new Parser(s).parse
-        println(Evaluator.evaluateContinuous(root))
+        oneREPL
       }
+    }
+  }
+
+  private def oneREPL: Unit = {
+    print(prompt)
+    Console.flush()
+
+    val s = io.StdIn.readLine()
+    if (exit.contains(s.trim())) {
+      break
+    }
+    val root = new Parser(s).parse
+
+    val res = Evaluator.evaluateContinuous(root)
+    if (res.isInstanceOf[DisplayInREPL]) {
+      println(res.value)
     }
   }
 }

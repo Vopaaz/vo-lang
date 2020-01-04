@@ -73,7 +73,7 @@ class ReplSpec extends FlatSpec {
     let x = 5
 
     x
-    
+
     :q
     """
 
@@ -90,4 +90,29 @@ class ReplSpec extends FlatSpec {
       )
     }
   }
+
+  it should "not print anything if the evaluation result is not a DisplayInREPL" in {
+    val rawInputs =
+      List("none", "func(){}", "let x = none", "let x = func(){}", "\n")
+
+    rawInputs.foreach(x => {
+      val input = x + "\n:q\n"
+      val in    = new StringBufferInputStream(input)
+      val out   = new ByteArrayOutputStream()
+      Console.withOut(out) {
+        Console.withIn(in) {
+          ReadLoop.startREPL
+        }
+        val outStr = out.toString()
+        assert(
+          outStr
+            .replace(ReadLoop._message, "")
+            .replaceAll(">", "")
+            .trim()
+            .length() == 0
+        )
+      }
+    })
+  }
+
 }

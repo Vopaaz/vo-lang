@@ -321,7 +321,7 @@ class EvalSpec extends FlatSpec {
       """, "ab"),
       ("""
       func(x, y){ x + y }("a", "b")
-      """, "ab")
+      """, "ab"),
     )
 
     checkInputExpected[VoString](inputExpected)

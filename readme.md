@@ -11,5 +11,5 @@ with some creative modifications rather than just follow step by step.
 
 ## TO-DOs
 
-- Clean up dirty error messages
-- Fix a linefeed alone will cause a "none" in REPL
+- [ ] Clean up dirty error messages
+- [x] Fix a linefeed alone will cause a "none" in REPL
