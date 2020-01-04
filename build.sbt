@@ -5,6 +5,8 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / organization := "com.github"
 ThisBuild / organizationName := "vopaaz"
 
+parallelExecution in Test := false
+
 lazy val root = (project in file("."))
   .settings(
     name := "vo-lang",
