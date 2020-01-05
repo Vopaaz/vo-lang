@@ -7,6 +7,14 @@ import java.io.{StringBufferInputStream, ByteArrayOutputStream}
 
 object Main {
   def main(args: Array[String]) = {
-    ReadLoop.startREPL
+    if (args.length > 1) {
+      throw new Exception("Only zero or one argument is supported.")
+    }
+
+    if (args.isEmpty) {
+      ReadLoop.startREPL
+    } else if (args.length == 1) {
+      Executor.execFile(args.head)
+    }
   }
 }
