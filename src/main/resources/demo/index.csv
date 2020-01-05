@@ -1,3 +1,6 @@
 filename, result
 HelloWorld, Hello world.
 Fibonacci-10, 55.0
+HighOrderFunc, 3.0
+If, negative
+UseAsCalculator, -3.333333333333333

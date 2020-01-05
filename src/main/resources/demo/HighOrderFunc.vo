@@ -1,0 +1,8 @@
+let addN = func(n){
+    func(x){
+        n + x
+    }
+}
+
+let add1 = addN(1)
+add1(2)

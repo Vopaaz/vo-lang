@@ -23,7 +23,7 @@ class ExecutorSpec extends FlatSpec {
 
   it should "run every demo" in {
     val csv =
-      Source.fromResource("demo/index.csv").getLines()
+      Source.fromResource("demo/index.csv").getLines().filter(_.nonEmpty)
     csv.next() // Skip the header
 
     csv.foreach(line => {
