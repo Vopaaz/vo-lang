@@ -81,6 +81,10 @@ Given that "use the value of the last statement in the block as the value of the
 is already there in Monkey,
 I decide to not implement the return statement in my Vo-Lang.
 
+### Integer and Number
+
+Integer is specifically defined in Monkey, while there is only Number (float/double) in Vo.
+
 ### Object Orient Programming
 
 Vo, unlike Monkey, will (hopefully) be an object orient language.
