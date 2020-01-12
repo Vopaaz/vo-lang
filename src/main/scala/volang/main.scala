@@ -13,8 +13,12 @@ object Main {
 
     if (args.isEmpty) {
       ReadLoop.startREPL
-    } else if (args.length == 1) {
-      Executor.execFile(args.head)
+    } else {
+      args.head match {
+        case "-p" => ReadLoop.startRPPL
+        case "-l" => ReadLoop.startRLPL
+        case _    => Executor.execFile(args.head)
+      }
     }
   }
 }
