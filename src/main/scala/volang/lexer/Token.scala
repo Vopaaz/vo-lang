@@ -74,6 +74,9 @@ class COMMA extends TokenType {
 class DOT extends TokenType {
   val literal: String = "."
 }
+class COLON extends TokenType {
+  val literal: String = ":"
+}
 class LINEFEED extends TokenType {
   val literal: String = "LF"
 }

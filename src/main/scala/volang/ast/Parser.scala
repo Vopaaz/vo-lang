@@ -90,6 +90,7 @@ class Parser(input: String) {
         case _: FALSE      => Some(parseBooleanLiteral)
         case _: NONE       => Some(parseNoneLiteral)
         case _: STRING     => Some(parseStringLiteral)
+        case _: LBRACE     => Some(parseDictLiteral)
       }
     }
 
@@ -228,5 +229,33 @@ class Parser(input: String) {
     }
     expect[RPAREN](nextToken)
     buff.toList
+  }
+
+  private def parseDictLiteral: DictLiteral = {
+    val buff = new ListBuffer[Tuple2[Expression, Expression]]
+    expect[LBRACE](nextToken)
+    skipLineFeeds
+    while (!peekToken.isInstanceOf[RBRACE]) {
+      skipLineFeeds
+      val key = parseExpression(Pri.lowest)
+      expect[COLON](nextToken)
+      val value = parseExpression(Pri.lowest)
+      buff += ((key, value))
+      if (peekToken.isInstanceOf[COMMA]) {
+        nextToken
+      } else {
+        skipLineFeeds
+        expect[RBRACE](peekToken)
+      }
+      skipLineFeeds
+    }
+    expect[RBRACE](nextToken)
+    new DictLiteral(buff.toList)
+  }
+
+  private def skipLineFeeds = {
+    while (peekToken.isInstanceOf[LINEFEED]) {
+      nextToken
+    }
   }
 }

@@ -488,4 +488,59 @@ return x
         assert(expressionRaw.toString() === expectedExpression.toString())
       })
   }
+
+  it should "parse an empty dict" in {
+    val input = """
+    {}
+
+    {
+
+    }
+    """
+
+    val statements = new Parser(input).parse.statements
+    statements.foreach(statement => {
+      assert(statement.isInstanceOf[ExpressionStatement])
+      val expressionRaw = statement.asInstanceOf[ExpressionStatement].expression
+      assert(expressionRaw.isInstanceOf[DictLiteral])
+    })
+  }
+
+  it should "parse a complex dict" in {
+    val input = """
+    {
+      "a": 1,
+      "b": "2",
+      3: func(){}
+    }
+    """
+
+    val expectedExpressionPairs = List(
+      (new StringLiteral(new STRING("a")), new NumberLiteral(new NUMBER(1))),
+      (new StringLiteral(new STRING("b")), new StringLiteral(new STRING("2"))),
+      (
+        new NumberLiteral(new NUMBER(3)),
+        new FunctionLiteral(List(), new BlockStatement(List()))
+      )
+    )
+
+    val statement = new Parser(input).parse.statements(0)
+    assert(statement.isInstanceOf[ExpressionStatement])
+    val expressionRaw = statement.asInstanceOf[ExpressionStatement].expression
+    assert(expressionRaw.isInstanceOf[DictLiteral])
+    val expression = expressionRaw.asInstanceOf[DictLiteral]
+    val pairs      = expression.pairs
+
+    def testOK(a: Expression, b: Expression) = {
+      assert(a.getClass() === b.getClass())
+      assert(a.toString() === b.toString())
+    }
+
+    pairs
+      .zip(expectedExpressionPairs)
+      .foreach(x => {
+        testOK(x._1._1, x._2._1)
+        testOK(x._1._2, x._2._2)
+      })
+  }
 }

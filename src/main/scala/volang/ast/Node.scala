@@ -154,3 +154,14 @@ class StringLiteral(val token: STRING) extends Expression {
     value
   }
 }
+
+class DictLiteral(val pairs: List[Tuple2[Expression, Expression]])
+    extends Expression {
+  override def toString(): String = {
+    "dict {" + pairs
+      .map(x => {
+        x._1.toString() + " -> " + x._2.toString()
+      })
+      .mkString(", ") + "}"
+  }
+}
